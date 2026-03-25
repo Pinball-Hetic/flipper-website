@@ -98,21 +98,40 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
-          port: ${{ secrets.SERVER_PORT }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            PROJECT_DIR="/srv/flipper-website"
+            # On définit le chemin absolu (plus fiable que ../..)
+            export DEPLOY_PATH="/srv/flipper-website"
             
-            mkdir -p $PROJECT_DIR
-            cd $PROJECT_DIR
+            echo "--- Vérification du dossier $DEPLOY_PATH ---"
             
+            # Si le dossier n'existe pas, on essaie de le créer (nécessite les droits)
+            if [ ! -d "$DEPLOY_PATH" ]; then
+              echo "Le dossier $DEPLOY_PATH n'existe pas. Tentative de création..."
+              mkdir -p "$DEPLOY_PATH" || echo "Impossible de créer le dossier. Vérifie les permissions sudo."
+            fi
+            
+            cd "$DEPLOY_PATH" || { echo "ERREUR : Impossible d'accéder à $DEPLOY_PATH"; exit 1; }
+            
+            echo "--- Login au registry ---"
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
             
+            echo "--- Pull de l'image ---"
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             
-            # Note: Le docker-compose.yml doit être présent dans /srv/flipper-website sur le serveur
-            docker-compose down
-            docker-compose up -d
+            echo "--- Relance des conteneurs ---"
+            if [ -f "docker-compose.yml" ]; then
+              docker-compose down
+              docker-compose up -d
+            else
+              echo "ERREUR : Aucun fichier docker-compose.yml trouvé dans $(pwd)"
+              echo "Contenu actuel du dossier :"
+              ls -la
+              exit 1
+            fi
             
+            echo "--- Nettoyage ---"
             docker image prune -f --filter "until=24h"
+            echo "--- Déploiement terminé avec succès ---"
