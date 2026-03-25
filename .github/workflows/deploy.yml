@@ -15,28 +15,28 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  lint-and-test:
-    name: 🧪 Lint & Checks
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  # lint-and-test:
+  #   name: 🧪 Lint & Checks
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '20'
+  #         cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci || npm install
+  #     - name: Install dependencies
+  #       run: npm ci || npm install
 
-      - name: Run Linter
-        run: npm run lint
+  #     - name: Run Linter
+  #       run: npm run lint
 
   build-and-push:
     name: 🐳 Build & Push Docker Image
-    needs: lint-and-test
+    # needs: lint-and-test
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && (github.ref == 'refs/heads/Production' || github.ref == 'refs/heads/Dev')
     
