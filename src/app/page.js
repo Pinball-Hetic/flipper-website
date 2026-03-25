@@ -65,7 +65,7 @@ export default function Home() {
       {error && (
         <div className="absolute top-24 left-1/2 -translate-x-1/2 z-[2000] w-[90%] max-w-md">
           <div className="bg-orange-500 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 border-2 border-orange-400/50 backdrop-blur-md">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"/>
             </svg>
             <p className="text-sm font-bold leading-tight">{error}</p>
@@ -78,7 +78,7 @@ export default function Home() {
       {/* Bottom Menu Bar */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-6">
         <button className="size-14 rounded-full bg-white shadow-xl flex items-center justify-center border-2 border-gray-100 active:scale-90 transition-transform">
-           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4A5568" stroke-width="2">
+           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4A5568" strokeWidth="2">
              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
            </svg>
         </button>
@@ -93,7 +93,7 @@ export default function Home() {
         </button>
 
         <button className="size-14 rounded-full bg-white shadow-xl flex items-center justify-center border-2 border-gray-100 active:scale-90 transition-transform">
-           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4A5568" stroke-width="2">
+           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4A5568" strokeWidth="2">
              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
            </svg>
         </button>

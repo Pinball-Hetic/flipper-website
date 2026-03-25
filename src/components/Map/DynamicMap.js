@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer as LeafletMapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -35,7 +35,18 @@ const checkpointIcon = new L.Icon({
   popupAnchor: [0, -30]
 });
 
-// Component to handle map centering
+// Component to handle map auto-centering when position changes
+function MapAutoRecenter({ position }) {
+  const map = useMap();
+  useEffect(() => {
+    if (position) {
+      map.flyTo(position, map.getZoom());
+    }
+  }, [position, map]);
+  return null;
+}
+
+// Component to handle map centering manually
 function RecenterButton({ position }) {
   const map = useMap();
   
@@ -44,7 +55,7 @@ function RecenterButton({ position }) {
       onClick={() => map.flyTo(position, 16)}
       className="absolute bottom-6 right-6 z-[1000] size-14 flex items-center justify-center bg-white rounded-full shadow-lg border-2 border-blue-100 active:scale-95 transition-transform"
     >
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3182CE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3182CE" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>
       </svg>
     </button>
@@ -55,8 +66,8 @@ export default function DynamicMap({ position, checkpoints }) {
   if (!position) return null;
 
   return (
-    <div className="relative h-full w-full">
-      <MapContainer 
+    <div className="relative h-full w-full" data-testid="map-container">
+      <LeafletMapContainer 
         center={position} 
         zoom={16} 
         scrollWheelZoom={true}
@@ -84,7 +95,7 @@ export default function DynamicMap({ position, checkpoints }) {
                 <h3 className="font-bold text-lg text-emerald-700">{cp.name}</h3>
                 <p className="text-sm text-gray-600">{cp.description}</p>
                 <button className="mt-2 w-full py-2 bg-emerald-500 text-white rounded-lg text-sm font-bold shadow-sm active:bg-emerald-600">
-                  Récupérer l'objet
+                  Récupérer l&apos;objet
                 </button>
               </div>
             </Popup>
@@ -92,7 +103,8 @@ export default function DynamicMap({ position, checkpoints }) {
         ))}
 
         <RecenterButton position={position} />
-      </MapContainer>
+        <MapAutoRecenter position={position} />
+      </LeafletMapContainer>
       
       {/* Overlay UI - Top bar */}
       <div className="absolute top-6 left-6 right-6 z-[1000] flex justify-between items-center">
@@ -109,7 +121,7 @@ export default function DynamicMap({ position, checkpoints }) {
         </div>
         
         <button className="size-12 rounded-full bg-white/90 backdrop-blur-md shadow-lg flex items-center justify-center border border-white/20">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2d3748" stroke-width="2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2d3748" strokeWidth="2">
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
           </svg>
         </button>
