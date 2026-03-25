@@ -10,7 +10,7 @@ export default function Home() {
 
   useEffect(() => {
     if (position) {
-      // Création de checkpoints mockés autour de la position actuelle
+      // Créations de checkpoints mockés autour de la position actuelle
       const mockCheckpoints = [
         {
           id: 1,
