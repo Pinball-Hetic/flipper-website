@@ -3,49 +3,66 @@
 @tailwind utilities;
 
 :root {
-  --background: #f0f7ff;
-  --foreground: #2d3748;
+  --background: #F8FAFC;
+  --foreground: #1E293B;
+  --primary: #2563EB;
+  --accent: #F97316;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Jost', sans-serif;
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Désactiver le scroll */
+  overflow: hidden;
   height: 100vh;
   width: 100vw;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Leaflet Container overrides */
 .leaflet-container {
   height: 100%;
   width: 100%;
-  background: #f0f7ff;
+  background: #F1F5F9;
 }
 
-/* Leaflet control overrides for minimalist UI */
-.leaflet-control-zoom {
-  border: none !important;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1) !important;
+/* Popup and UI Refinement */
+.leaflet-popup-content-wrapper {
+  border-radius: 1.5rem !important;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px);
 }
 
-.leaflet-control-zoom-in, .leaflet-control-zoom-out {
-  background-color: white !important;
-  color: #3182CE !important;
-  border-radius: 50% !important;
-  margin-bottom: 5px !important;
-  border: none !important;
+.leaflet-popup-tip {
+  display: none !important;
 }
 
 /* Custom animations */
-@keyframes pulse {
-  0% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.1); opacity: 1; }
-  100% { transform: scale(1); opacity: 0.8; }
+@keyframes playerPulse {
+  0% { transform: scale(1); opacity: 0.15; }
+  50% { transform: scale(1.4); opacity: 0.05; }
+  100% { transform: scale(1); opacity: 0.15; }
 }
 
 .animate-player-pulse {
-  animation: pulse 2s infinite ease-in-out;
+  animation: none; /* Reset basic pulse */
+  position: relative;
+}
+
+/* More sophisticated pulse effect */
+.animate-player-pulse::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: #2563EB;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: playerPulse 3s infinite ease-out;
+  z-index: -1;
 }

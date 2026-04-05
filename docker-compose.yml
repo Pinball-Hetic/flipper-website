@@ -1,5 +1,4 @@
-version: '3.8'
-
+# Production : build multi-étapes (standalone) — `docker compose up --build`
 services:
   next-app:
     build:
@@ -8,6 +7,8 @@ services:
     container_name: flipper-website
     ports:
       - "3000:3000"
+    env_file:
+      - .env
     environment:
       - NODE_ENV=production
     restart: always

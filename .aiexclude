@@ -1,0 +1,4 @@
+# Secrets — exclus du contexte Gemini Code Assist (syntaxe type .gitignore)
+.env
+.env.*
+!.env.example

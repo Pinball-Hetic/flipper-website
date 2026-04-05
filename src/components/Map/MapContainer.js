@@ -15,5 +15,9 @@ const Map = dynamic(() => import("./DynamicMap"), {
 });
 
 export default function MapContainer(props) {
-  return <Map {...props} />;
+  return (
+    <div className="h-full w-full relative">
+      <Map {...props} />
+    </div>
+  );
 }
