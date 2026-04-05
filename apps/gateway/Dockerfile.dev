@@ -1,0 +1,18 @@
+FROM node:20-alpine
+WORKDIR /app
+
+# Copier uniquement les manifests
+COPY package.json package-lock.json* ./
+COPY apps/gateway/package.json ./apps/gateway/
+COPY packages/database/package.json ./packages/database/
+
+# Copier le code local des packages pour permettre à NPM d'installer les dépendances locales
+COPY packages/database ./packages/database
+
+RUN npm install
+
+# Copier le reste du code
+COPY . .
+
+EXPOSE 3000
+CMD ["npm", "run", "dev", "-w", "@pocket-maps/gateway"]

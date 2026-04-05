@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #F8FAFC;
+    --foreground: #1E293B;
+    --primary: #2563EB;
+    --accent: #F97316;
+    /* 2026 Apple-style Glassmorphism tokens */
+    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.7);
+    --glass-reflection: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 100%);
+    --shadow-spatial: 0 25px 50px -12px rgba(0, 0, 0, 0.18);
+  }
+
+  body {
+    color: var(--foreground);
+    background: var(--background);
+    font-family: 'Jost', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  /* Apple 2026 Glassmorphism Utility */
+  .glass-panel {
+    @apply backdrop-blur-3xl border shadow-2xl;
+    background-color: var(--glass-bg);
+    border-color: var(--glass-border);
+    background-image: var(--glass-reflection);
+    box-shadow: var(--shadow-spatial);
+  }
+
+  /* Refined Leaflet Popup Styling */
+  .custom-popup .leaflet-popup-content-wrapper {
+    @apply backdrop-blur-3xl border border-white/60 rounded-[2.5rem] overflow-hidden;
+    padding: 0 !important;
+    background-color: var(--glass-bg);
+    background-image: var(--glass-reflection);
+    box-shadow: var(--shadow-spatial);
+  }
+
+  .custom-popup .leaflet-popup-content {
+    @apply !m-0 !w-auto;
+  }
+
+  /* Suppression de l'ombre par défaut de Leaflet qui entre en conflit avec notre ombre spatiale */
+  .leaflet-popup-content-wrapper {
+    box-shadow: none !important;
+  }
+
+  .leaflet-popup-tip-container {
+    @apply hidden;
+  }
+}
+
+/* Scrollbar invisible pour mobile */
+.custom-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.custom-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Spatial UI Animations */
+@keyframes spatial-float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.02); }
+}
+
+.animate-spatial {
+  animation: spatial-float 5s ease-in-out infinite;
+}
+
+/* Player pulse correction */
+@keyframes playerPulse {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+  100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+}
+
+.animate-player-pulse::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: var(--primary);
+  border-radius: 50%;
+  animation: playerPulse 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
+}

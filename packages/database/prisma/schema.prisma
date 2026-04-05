@@ -28,6 +28,7 @@ model User {
   // Game relations
   visits        Visit[]
   badges        UserBadge[]
+  scores        Score[]
 
   @@map("user")
 }
@@ -105,17 +106,47 @@ model UserBadge {
 
 model Checkpoint {
   id          String   @id @default(cuid())
-  name        String
+  name        String   // Nom de l'établissement (ex: "Le Café des Sports")
   description String?
+  type        String   @default("OTHER") // RESTAURANT, CULTURE, STATION, etc.
+  address     String?
   lat         Float
   lng         Float
   location    Unsupported("geography(Point, 4326)")?
   createdAt   DateTime @default(now())
   
   // Relations
+  machines    Machine[]
   visits      Visit[]
 
   @@map("checkpoint")
+}
+
+model Machine {
+  id           String     @id @default(cuid())
+  name         String     // Nom du flipper (ex: "The Addams Family")
+  checkpointId String
+  checkpoint   Checkpoint @relation(fields: [checkpointId], references: [id])
+  createdAt    DateTime   @default(now())
+  
+  // Relations
+  scores       Score[]
+
+  @@map("machine")
+}
+
+model Score {
+  id        String   @id @default(cuid())
+  value     Int
+  userId    String
+  machineId String
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id])
+  machine   Machine  @relation(fields: [machineId], references: [id])
+
+  @@index([machineId, value(sort: Desc)])
+  @@map("score")
 }
 
 model Visit {

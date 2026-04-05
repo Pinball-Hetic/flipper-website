@@ -1,0 +1,24 @@
+FROM node:20-alpine
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# Copier les manifests
+COPY package.json package-lock.json* ./
+COPY apps/client/package.json ./apps/client/
+COPY packages/database/package.json ./packages/database/
+
+# Copier les dépendances locales
+COPY packages/database ./packages/database
+
+RUN npm install
+
+# Copier tout le code source pour le dev
+COPY . .
+
+# Générer Prisma
+RUN npm run db:generate -w @pocket-maps/database
+
+EXPOSE 3001
+ENV PORT 3001
+
+CMD ["npm", "run", "dev", "-w", "@pocket-maps/client"]

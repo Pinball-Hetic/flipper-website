@@ -3,43 +3,19 @@
 import { useGeolocation } from "@/hooks/useGeolocation";
 import MapContainer from "@/components/Map/MapContainer";
 import { useEffect, useState } from "react";
+import { getCheckpoints } from "./actions";
 
 export default function Home() {
   const { position, loading, error, defaultPosition } = useGeolocation();
   const [checkpoints, setCheckpoints] = useState([]);
 
   useEffect(() => {
-    if (position) {
-      // Création de checkpoints mockés autour de la position actuelle
-      const mockCheckpoints = [
-        {
-          id: 1,
-          name: "Point d'Observation",
-          description: "Un panorama exceptionnel sur les environs, parfait pour s'orienter.",
-          position: [position[0] + 0.002, position[1] + 0.002],
-        },
-        {
-          id: 2,
-          name: "Ancien Monument",
-          description: "Un vestige historique conservant les traces du passé local.",
-          position: [position[0] - 0.001, position[1] + 0.003],
-        },
-        {
-          id: 3,
-          name: "Espace Vert",
-          description: "Un havre de paix idéal pour une pause lors de votre exploration.",
-          position: [position[0] + 0.003, position[1] - 0.001],
-        },
-        {
-          id: 4,
-          name: "Point de Ralliement",
-          description: "Un carrefour central souvent utilisé comme point de départ.",
-          position: [position[0] - 0.002, position[1] - 0.002],
-        }
-      ];
-      setCheckpoints(mockCheckpoints);
-    }
-  }, [position]);
+    const fetchData = async () => {
+      const data = await getCheckpoints();
+      setCheckpoints(data);
+    };
+    fetchData();
+  }, []);
 
   if (loading) {
     return (
@@ -76,24 +52,24 @@ export default function Home() {
       
       <MapContainer position={position || defaultPosition} checkpoints={checkpoints} />
       
-      {/* Bottom Menu Bar */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-6">
-        <button className="size-14 rounded-2xl bg-white shadow-xl flex items-center justify-center border border-slate-100 active:scale-90 transition-all hover:bg-slate-50 text-slate-600">
-           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      {/* Bottom Menu Bar - 2026 Apple Spatial Style */}
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-5 p-2 bg-white/30 backdrop-blur-3xl border border-white/50 rounded-[2.5rem] shadow-spatial" style={{ backgroundImage: 'var(--glass-reflection)' }}>
+        <button className="size-14 rounded-[1.75rem] bg-white/40 backdrop-blur-md flex items-center justify-center border border-white/60 shadow-sm active:scale-90 transition-all hover:bg-white/60 text-slate-700">
+           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
            </svg>
         </button>
         
-        <button className="size-20 rounded-[2.5rem] bg-orange-500 shadow-2xl shadow-orange-500/40 flex items-center justify-center border-4 border-white active:scale-95 transition-all group hover:bg-orange-600">
+        <button className="size-20 rounded-[2rem] bg-gradient-to-tr from-orange-500 to-orange-400 shadow-[0_15px_30px_-5px_rgba(249,115,22,0.4)] flex items-center justify-center border-[3px] border-white active:scale-95 transition-all group hover:rotate-12">
            <div className="size-10 flex items-center justify-center text-white">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 2v20M2 12h20"/>
               </svg>
            </div>
         </button>
 
-        <button className="size-14 rounded-2xl bg-white shadow-xl flex items-center justify-center border border-slate-100 active:scale-90 transition-all hover:bg-slate-50 text-slate-600">
-           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <button className="size-14 rounded-[1.75rem] bg-white/40 backdrop-blur-md flex items-center justify-center border border-white/60 shadow-sm active:scale-90 transition-all hover:bg-white/60 text-slate-700">
+           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
            </svg>
         </button>

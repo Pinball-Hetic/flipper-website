@@ -11,16 +11,17 @@ module.exports = {
         background: "var(--background)",
         foreground: "var(--foreground)",
         primary: {
-          DEFAULT: "#38A169", // Vert Pokémon Go
-          soft: "#C6F6D5",
+          DEFAULT: "var(--primary)",
         },
         accent: {
-          DEFAULT: "#3182CE", // Bleu Pokémon Go
-          soft: "#BEE3F8",
+          DEFAULT: "var(--accent)",
         }
       },
+      boxShadow: {
+        'spatial': 'var(--shadow-spatial)',
+      },
       borderRadius: {
-        'pokemon': '2rem',
+        'explorer': '2.5rem',
       },
     },
   },
