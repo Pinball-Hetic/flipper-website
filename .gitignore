@@ -52,3 +52,11 @@ logs
 *.njsproj
 *.sln
 *.sw?
+
+/src/generated/prisma
+
+.env
+
+.gemini/
+
+GEMINI.md

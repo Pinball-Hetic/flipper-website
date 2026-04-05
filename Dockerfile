@@ -12,6 +12,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Generer le client Prisma
+RUN npx prisma generate
+
 # Desactiver la collecte de donnees Next.js
 ENV NEXT_TELEMETRY_DISABLED 1
 

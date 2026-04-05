@@ -1,0 +1,40 @@
+version: '3'
+
+tasks:
+  # Development Tasks
+  docker:dev:up:
+    desc: Start the development environment
+    cmds:
+      - docker compose -f docker-compose.dev.yml up -d --build
+
+  docker:dev:down:
+    desc: Stop the development environment
+    cmds:
+      - docker compose -f docker-compose.dev.yml down
+
+  docker:dev:logs:
+    desc: View development logs
+    cmds:
+      - docker compose -f docker-compose.dev.yml logs -f
+
+  # Production Tasks
+  docker:prod:up:
+    desc: Start the production environment
+    cmds:
+      - docker compose up -d --build
+
+  docker:prod:down:
+    desc: Stop the production environment
+    cmds:
+      - docker compose down
+
+  docker:prod:logs:
+    desc: View production logs
+    cmds:
+      - docker compose logs -f
+
+  # Utils
+  docker:clean:
+    desc: Remove all stopped containers and unused images
+    cmds:
+      - docker system prune -f

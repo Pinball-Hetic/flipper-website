@@ -1,0 +1,4 @@
+# Secrets — exclus du contexte automatique Claude Code (syntaxe type .gitignore)
+.env
+.env.*
+!.env.example
