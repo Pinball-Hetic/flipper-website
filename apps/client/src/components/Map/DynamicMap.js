@@ -28,7 +28,7 @@ function RecenterButton({ position }) {
   return (
     <button
       onClick={() => map.flyTo(position, 16)}
-      className="absolute bottom-6 right-6 z-[1000] size-14 flex items-center justify-center bg-white rounded-2xl shadow-xl border border-gray-100 active:scale-95 transition-all hover:bg-gray-50"
+      className="absolute bottom-6 right-6 z-1000 size-14 flex items-center justify-center bg-white rounded-2xl shadow-xl border border-gray-100 active:scale-95 transition-all hover:bg-gray-50"
     >
       <svg
         width="24"
@@ -179,7 +179,7 @@ export default function DynamicMap({ position, checkpoints }) {
       />
 
       {/* Overlay UI - Top bar Spatial */}
-      <div className="absolute top-6 left-6 right-6 z-[1000] flex justify-end items-center pointer-events-none">
+      <div className="absolute top-6 left-6 right-6 z-1000 flex justify-end items-center pointer-events-none">
         <button className="size-12 rounded-2xl bg-white/45 backdrop-blur-2xl shadow-spatial flex items-center justify-center border border-white/50 text-slate-700 hover:bg-white transition-all pointer-events-auto active:scale-90" style={{ backgroundImage: 'var(--glass-reflection)' }}>
           <svg
             width="20"

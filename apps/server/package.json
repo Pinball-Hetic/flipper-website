@@ -9,8 +9,8 @@
   },
   "dependencies": {
     "@pocket-maps/database": "*",
-    "express": "^4.21.0",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5"
+    "dotenv": "17.4.1",
+    "express": "5.2.1"
   }
 }

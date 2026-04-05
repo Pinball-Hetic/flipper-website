@@ -86,4 +86,14 @@
     - Refonte de la logique de proxy de la Gateway pour séparer `/api/auth` (vers Client) du reste de l' `/api` (vers Server).
     - Résolution des problèmes CORS via une politique de "White-list" stricte et l'activation des `credentials`.
 
+### 🆙 Mise à jour massive de la Stack
+- **Décision** : Aligner le projet sur les toutes dernières versions stables pour bénéficier des performances de React 19 et Tailwind 4.
+- **Actions** :
+    - **Frontend** : Migration **Next.js 15 → 16.2.2** et **React 18 → 19.2.4** (via codemod).
+    - **Style** : Migration **Tailwind CSS v3 → v4.2.2** (Configuration CSS-first, suppression de `tailwind.config.js`).
+    - **Backend** : Passage à **Express 5.2.1** (support natif des Promises) et **Dotenv 17.4.1**.
+    - **Database** : Mise à jour **Prisma 7.5.0 → 7.6.0**.
+    - **UI** : Mise à jour de **Framer Motion 12**, **Lucide React 1.7** et **React Leaflet 5.0**.
+    - **Validation** : Build de production réussi sur l'ensemble du monorepo.
+
 

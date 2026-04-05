@@ -23,11 +23,14 @@ Application web mobile-first d'exploration urbaine et de géolocalisation. Style
 - [x] Intégration Supabase : MCP Server ajouté et Supabase Agent Skills installés.
 
 ## 📂 Structure des Fichiers Clés (Monorepo)
-- `apps/client` : Frontend Next.js 15 (Modern Explorer UI).
+- `apps/client` : Frontend Next.js 16 (Modern Explorer UI).
 - `apps/server` : Backend Express (API & Logique métier).
 - `apps/gateway` : Gateway Express (Middleware, Proxy, Auth).
 - `packages/database` : Source unique pour Prisma et le client DB.
 - `package.json` : Orchestration globale via Workspaces NPM.
+
+## 🧠 Mémoire du Projet
+- L'instruction **"note ça dans la mémoire du projet"** signifie systématiquement mettre à jour la documentation située dans `@documentation/**` (Vault Obsidian).
 
 ## 💡 Décisions Techniques & Corrections
 1. **Identité Visuelle** : Abandon du thème Pokémon Go au profit d'un design "Modern Explorer" (Orange #F97316, Teal #0D9488, Blue #2563EB).

@@ -88,7 +88,7 @@ export function ProfileModal({ isOpen, onOpenChange }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[5000] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-5000 flex items-center justify-center p-4">
       {/* Overlay Backdrop */}
       <div 
         className="absolute inset-0 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300"
@@ -96,7 +96,7 @@ export function ProfileModal({ isOpen, onOpenChange }) {
       />
 
       {/* Modal Content */}
-      <div className="relative w-full max-w-[420px] glass-panel border-none rounded-[2.5rem] shadow-spatial overflow-hidden animate-in zoom-in-95 fade-in duration-300">
+      <div className="relative w-full max-w-[420px] glass-panel border-none rounded-explorer shadow-spatial overflow-hidden animate-in zoom-in-95 fade-in duration-300">
         {/* Close Button */}
         <button 
           onClick={() => onOpenChange(false)}
@@ -122,7 +122,7 @@ export function ProfileModal({ isOpen, onOpenChange }) {
           ) : session ? (
             <div className="flex flex-col gap-8">
               <div className="flex items-center gap-5 p-4 bg-white/40 rounded-[1.75rem] border border-white/60">
-                <Avatar className="size-16 border-2 border-white shadow-sm">
+                <Avatar className="size-16 border-2 border-white shadow-xs">
                   <AvatarImage src={session.user.image} />
                   <AvatarFallback className="bg-orange-500 text-white font-black text-xl">
                     {session.user.name?.[0]}
@@ -160,7 +160,7 @@ export function ProfileModal({ isOpen, onOpenChange }) {
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={isGoogleLoading}
-                className="w-full h-14 bg-white hover:bg-slate-50 text-slate-900 rounded-2xl font-black text-sm uppercase tracking-widest gap-3 border border-slate-200 shadow-sm transition-all"
+                className="w-full h-14 bg-white hover:bg-slate-50 text-slate-900 rounded-2xl font-black text-sm uppercase tracking-widest gap-3 border border-slate-200 shadow-xs transition-all"
               >
                 {isGoogleLoading ? <Loader2 className="animate-spin" size={18} /> : (
                   <svg width="20" height="20" viewBox="0 0 24 24">
@@ -189,7 +189,7 @@ export function ProfileModal({ isOpen, onOpenChange }) {
                     <div className="relative">
                       <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                       <Input 
-                        className="h-14 pl-12 rounded-2xl bg-white/50 border-white/60 focus:bg-white transition-all shadow-sm"
+                        className="h-14 pl-12 rounded-2xl bg-white/50 border-white/60 focus:bg-white transition-all shadow-xs"
                         placeholder="Votre nom"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -205,7 +205,7 @@ export function ProfileModal({ isOpen, onOpenChange }) {
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                     <Input 
                       type="email"
-                      className="h-14 pl-12 rounded-2xl bg-white/50 border-white/60 focus:bg-white transition-all shadow-sm"
+                      className="h-14 pl-12 rounded-2xl bg-white/50 border-white/60 focus:bg-white transition-all shadow-xs"
                       placeholder="email@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -220,7 +220,7 @@ export function ProfileModal({ isOpen, onOpenChange }) {
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                     <Input 
                       type="password"
-                      className="h-14 pl-12 rounded-2xl bg-white/50 border-white/60 focus:bg-white transition-all shadow-sm"
+                      className="h-14 pl-12 rounded-2xl bg-white/50 border-white/60 focus:bg-white transition-all shadow-xs"
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}

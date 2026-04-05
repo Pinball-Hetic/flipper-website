@@ -8,7 +8,7 @@ export default function ScoreboardModal({ isOpen, onClose, checkpoint }) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[3000] flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div className="fixed inset-0 z-3000 flex items-end sm:items-center justify-center p-0 sm:p-4">
           {/* Backdrop avec flou progressif */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -43,7 +43,7 @@ export default function ScoreboardModal({ isOpen, onClose, checkpoint }) {
               </button>
 
               <div className="mt-4 mb-6 pr-14">
-                <span className="inline-block px-3 py-1 rounded-xl bg-white/50 border border-white/60 text-slate-700 text-[10px] font-black uppercase tracking-[0.15em] mb-2 shadow-sm">
+                <span className="inline-block px-3 py-1 rounded-xl bg-white/50 border border-white/60 text-slate-700 text-[10px] font-black uppercase tracking-[0.15em] mb-2 shadow-xs">
                   {checkpoint.type}
                 </span>
                 <h2 className="text-3xl font-black text-slate-900 leading-tight tracking-tight">
@@ -72,7 +72,7 @@ export default function ScoreboardModal({ isOpen, onClose, checkpoint }) {
               {checkpoint.machines && checkpoint.machines.length > 0 ? (
                 <div className="space-y-6">
                   {checkpoint.machines.map((machine) => (
-                    <div key={machine.id} className="bg-white/40 backdrop-blur-md rounded-[2rem] p-6 border border-white/60 shadow-sm relative overflow-hidden group">
+                    <div key={machine.id} className="bg-white/40 backdrop-blur-md rounded-4xl p-6 border border-white/60 shadow-xs relative overflow-hidden group">
                       <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
                            <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
@@ -87,7 +87,7 @@ export default function ScoreboardModal({ isOpen, onClose, checkpoint }) {
                       <div className="space-y-2.5">
                         {machine.scores && machine.scores.length > 0 ? (
                           machine.scores.map((score, index) => (
-                            <div key={score.id} className="flex items-center justify-between bg-white/60 backdrop-blur-sm p-4 rounded-2xl border border-white shadow-sm hover:translate-x-1 transition-transform">
+                            <div key={score.id} className="flex items-center justify-between bg-white/60 backdrop-blur-xs p-4 rounded-2xl border border-white shadow-xs hover:translate-x-1 transition-transform">
                               <div className="flex items-center gap-4">
                                 <span className={`size-8 rounded-xl flex items-center justify-center font-black text-xs shadow-inner ${
                                   index === 0 ? 'bg-orange-500 text-white' : 
@@ -115,7 +115,7 @@ export default function ScoreboardModal({ isOpen, onClose, checkpoint }) {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-16 bg-white/20 rounded-[2.5rem] border border-dashed border-white/50">
+                <div className="text-center py-16 bg-white/20 rounded-explorer border border-dashed border-white/50">
                    <p className="text-slate-500 font-bold uppercase tracking-[0.2em] text-xs">Waiting for machine...</p>
                 </div>
               )}
