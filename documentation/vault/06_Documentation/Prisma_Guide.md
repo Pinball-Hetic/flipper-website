@@ -1,6 +1,6 @@
 # 🗄️ Guide d'Utilisation de Prisma
 
-Ce document explique comment gérer la base de données PostgreSQL (via Supabase) en utilisant l'ORM Prisma v7.5.0.
+Ce document explique comment gérer la base de données PostgreSQL (via Supabase) en utilisant l'ORM Prisma v7.6.0.
 
 ## 🔗 Configuration des Connexions
 

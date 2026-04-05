@@ -18,7 +18,7 @@ COPY . .
 # Générer Prisma
 RUN npm run db:generate -w @pocket-maps/database
 
-EXPOSE 3001
-ENV PORT 3001
+EXPOSE 8888
+ENV PORT 8888
 
 CMD ["npm", "run", "dev", "-w", "@pocket-maps/client"]

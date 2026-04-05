@@ -31,3 +31,11 @@
 - **Problème** : `Cannot find module '.prisma/client/default'` dans le runner Docker.
 - **Solution** : Ajout explicite de `RUN npx prisma generate` dans l'étape `builder` du `Dockerfile` avant le build Next.js.
 
+### 07 - Erreur CORS (Better Auth + Gateway)
+- **Problème** : Blocage du fetch car l'en-tête `Access-Control-Allow-Origin` ne peut pas être un joker (`*`) quand les credentials sont inclus.
+- **Solution** : Mise à jour de la Gateway Express pour utiliser une liste blanche d'origines (`8888`, `8881`) et forcer `credentials: true`.
+
+### 08 - Erreur 404 sur /api/auth (Proxy Routing)
+- **Problème** : Les requêtes d'authentification étaient envoyées au Serveur au lieu du Client à cause d'une règle proxy `/api` trop large.
+- **Solution** : Ajout d'une condition prioritaire dans la Gateway pour router spécifiquement `/api/auth` vers le Client Next.js.
+

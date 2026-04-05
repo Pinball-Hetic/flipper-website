@@ -1,27 +1,19 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config({ path: '../../.env' });
-const { prisma } = require('@pocket-maps/database');
+
 const app = express();
-const port = process.env.SERVER_PORT || 4000;
+// Port Serveur : 8882
+const port = 8882;
 
 app.use(cors());
 app.use(express.json());
 
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', service: 'server' });
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', service: 'server', port });
 });
 
-app.get('/api/checkpoints', async (req, res) => {
-  try {
-    const checkpoints = await prisma.checkpoint.findMany({
-      include: { machines: true }
-    });
-    res.json(checkpoints);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+// Vos autres routes API ici...
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);

@@ -1,18 +1,148 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@plugin 'tailwindcss-animate';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --shadow-spatial: var(--shadow-spatial);
+
+  --radius-explorer: 2.5rem;
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility glass-panel {
+  /* Apple 2026 Glassmorphism Utility */
+  @apply backdrop-blur-3xl border shadow-2xl;
+  background-color: var(--glass-bg);
+  border-color: var(--glass-border);
+  background-image: var(--glass-reflection);
+  box-shadow: var(--shadow-spatial);
+}
+
+@utility custom-popup {
+  /* Refined Leaflet Popup Styling */
+  & .leaflet-popup-content-wrapper {
+    @apply backdrop-blur-3xl border border-white/60 rounded-[2.5rem] overflow-hidden;
+    padding: 0 !important;
+    background-color: var(--glass-bg);
+    background-image: var(--glass-reflection);
+    box-shadow: var(--shadow-spatial);
+  }
+
+  & .leaflet-popup-content {
+    @apply m-0! w-auto!;
+  }
+}
+
+@utility leaflet-popup-content-wrapper {
+  /* Refined Leaflet Popup Styling */
+  .custom-popup & {
+    @apply backdrop-blur-3xl border border-white/60 rounded-[2.5rem] overflow-hidden;
+    padding: 0 !important;
+    background-color: var(--glass-bg);
+    background-image: var(--glass-reflection);
+    box-shadow: var(--shadow-spatial);
+  }
+
+  /* Suppression de l'ombre par défaut de Leaflet qui entre en conflit avec notre ombre spatiale */
+  box-shadow: none !important;
+}
+
+@utility leaflet-popup-content {
+  .custom-popup & {
+    @apply m-0! w-auto!;
+  }
+}
+
+@utility leaflet-popup-tip-container {
+  @apply hidden;
+}
 
 @layer base {
   :root {
-    --background: #F8FAFC;
-    --foreground: #1E293B;
-    --primary: #2563EB;
-    --accent: #F97316;
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --primary: oklch(0.205 0 0);
+    --accent: oklch(0.97 0 0);
     /* 2026 Apple-style Glassmorphism tokens */
     --glass-bg: rgba(255, 255, 255, 0.65);
     --glass-border: rgba(255, 255, 255, 0.7);
     --glass-reflection: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.2) 100%);
     --shadow-spatial: 0 25px 50px -12px rgba(0, 0, 0, 0.18);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.708 0 0);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --radius: 0.625rem;
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.708 0 0);
   }
 
   body {
@@ -25,39 +155,50 @@
     height: 100vh;
     width: 100vw;
     -webkit-font-smoothing: antialiased;
+    @apply bg-background text-foreground;
   }
-}
-
-@layer components {
-  /* Apple 2026 Glassmorphism Utility */
-  .glass-panel {
-    @apply backdrop-blur-3xl border shadow-2xl;
-    background-color: var(--glass-bg);
-    border-color: var(--glass-border);
-    background-image: var(--glass-reflection);
-    box-shadow: var(--shadow-spatial);
+  .theme {
+    --font-heading: var(--font-sans);
+    --font-sans: var(--font-sans);
   }
-
-  /* Refined Leaflet Popup Styling */
-  .custom-popup .leaflet-popup-content-wrapper {
-    @apply backdrop-blur-3xl border border-white/60 rounded-[2.5rem] overflow-hidden;
-    padding: 0 !important;
-    background-color: var(--glass-bg);
-    background-image: var(--glass-reflection);
-    box-shadow: var(--shadow-spatial);
+  .dark {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
   }
-
-  .custom-popup .leaflet-popup-content {
-    @apply !m-0 !w-auto;
+  * {
+    @apply border-border;
   }
-
-  /* Suppression de l'ombre par défaut de Leaflet qui entre en conflit avec notre ombre spatiale */
-  .leaflet-popup-content-wrapper {
-    box-shadow: none !important;
-  }
-
-  .leaflet-popup-tip-container {
-    @apply hidden;
+  html {
+    @apply font-sans;
   }
 }
 

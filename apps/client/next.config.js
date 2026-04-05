@@ -4,7 +4,7 @@ const nextConfig = {
   reactStrictMode: false,
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost:3000', 'http://localhost:3000', 'client:3001'],
+      allowedOrigins: ['localhost:8888', 'localhost:8881', 'http://localhost:8888', 'http://localhost:8881'],
     },
   },
 };

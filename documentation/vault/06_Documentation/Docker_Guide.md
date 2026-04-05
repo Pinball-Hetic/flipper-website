@@ -20,19 +20,22 @@ Build multi-étapes (`Dockerfile` : deps → builder → runner **standalone**),
 docker compose up --build
 ```
 
-- **Port** : `http://localhost:3000`
-- **Redémarrage** : `unless-stopped` (voir `docker-compose.yml`)
+- **Port (Public)** : `http://localhost:8881` (Gateway)
+- **Redémarrage** : `always`
 
 ## Développement
 
-Next.js en mode `next dev`, code monté depuis le dépôt, volumes pour `node_modules` et `.next` (binaires Linux dans le conteneur).
+Next.js en mode `next dev`, code monté depuis le dépôt, volumes pour `node_modules` et `.next`.
 
 ```bash
 docker compose -f docker-compose.dev.yml up --build
 ```
 
-- **Port** : `http://localhost:3000` (ne pas lancer prod et dev en même temps sur le même port sans en changer un)
-- Au démarrage : `npm ci`, `prisma generate`, puis `next dev -H 0.0.0.0`
+- **Ports** : 
+    - Gateway : `8881`
+    - Client : `8888`
+    - Server : `8882`
+- Au démarrage : `npm ci`, `prisma generate`, puis `next dev`
 - **Polling** : `WATCHPACK_POLLING=true` pour le file watching sous Docker Desktop
 
 ## Build de production (Dockerfile)

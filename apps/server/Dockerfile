@@ -28,5 +28,5 @@ COPY --from=builder /app/packages/database ./packages/database
 
 WORKDIR /app/apps/server
 
-EXPOSE 4000
+EXPOSE 8882
 CMD ["node", "index.js"]

@@ -17,5 +17,5 @@ COPY . .
 # Générer Prisma
 RUN npm run db:generate -w @pocket-maps/database
 
-EXPOSE 4000
+EXPOSE 8882
 CMD ["npm", "run", "dev", "-w", "@pocket-maps/server"]
