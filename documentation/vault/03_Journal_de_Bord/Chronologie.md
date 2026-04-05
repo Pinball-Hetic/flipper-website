@@ -65,18 +65,25 @@
     - Création de la classe utilitaire `.glass-panel` et tokens CSS pour le verre poli.
     - Refonte de la barre de navigation et des popups en mode "flottant".
     - Correction des erreurs de build Tailwind via l'intégration des tokens dans `tailwind.config.js`.
+    - Remplacement des icônes par `lucide-react` (QR Code central, User pour le profil).
 
-### 🗄️ Backend : Intégration de la vraie base de données
-- **Décision** : Abandonner les mocks au profit de données réelles Supabase.
+### 🔑 Authentification : Better Auth & Google
+- **Décision** : Implémenter un système complet d'authentification tout en permettant l'exploration en tant qu'invité.
 - **Actions** :
-    - Mise à jour du schéma Prisma : Modèles `Machine` (Bornes de flipper) et `Score` (Leaderboards).
-    - Création d'un script de seeding intelligent (`prisma/seed.js`) automatisé dans le `Dockerfile.dev`.
-    - Implémentation de Server Actions (`src/app/actions.js`) pour le fetch temps réel.
+    - Configuration de **Better Auth** dans `apps/client`.
+    - Intégration du provider **Google Social** (via client ID/secret).
+    - Création de la `ProfileModal` : un composant hybride gérant connexion email, inscription et login social.
+    - Gestion dynamique des sessions : affichage de l'avatar et des statistiques (fictives pour l'instant) une fois connecté.
 
-### 🏆 Feature : Scoreboards & Checkpoints Dynamiques
-- **Décision** : Transformer les points d'intérêt en bornes de jeu interactives.
+### 🌐 Infrastructure : Nouvelle Architecture de Ports
+- **Décision** : Changer les ports par défaut pour éviter les conflits et clarifier les flux.
+- **Nouvelle Config** : 
+    - **Gateway** : 8881 (Point d'entrée unique).
+    - **Client (Next.js)** : 8888.
+    - **Server (Express)** : 8882.
 - **Actions** :
-    - Ajout d'icônes de carte différenciées par type (Restaurant, Gare, Culture).
-    - Création du `ScoreboardModal` : Panneau spatial affichant les records par machine.
-    - Refonte ergonomique de la popup : Espacements optimisés pour le tactile et hiérarchie visuelle claire.
+    - Mise à jour des `Dockerfiles` (EXPOSE, ENV PORT).
+    - Refonte de la logique de proxy de la Gateway pour séparer `/api/auth` (vers Client) du reste de l' `/api` (vers Server).
+    - Résolution des problèmes CORS via une politique de "White-list" stricte et l'activation des `credentials`.
+
 
