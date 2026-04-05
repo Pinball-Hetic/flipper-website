@@ -1,36 +1,39 @@
-# Mémoire du Projet : Pocket Maps (Style Pokémon Go)
+# Mémoire du Projet : Pocket Maps (Modern Explorer)
 
 ## 📋 Présentation
-Application web mobile-first inspirée de l'interface et de l'expérience utilisateur de Pokémon Go.
+Application web mobile-first d'exploration urbaine et de géolocalisation. Style visuel "Modern Explorer" (minimaliste, sophistiqué, typographie géométrique).
 
 ## 🛠 Stack Technique
 - **Frontend** : Next.js 15 (App Router, JavaScript)
-- **Carte** : Leaflet via `react-leaflet` (Import dynamique sans SSR)
-- **Style** : Tailwind CSS + Framer Motion (pour les animations)
+- **Carte** : Leaflet via `react-leaflet` (Style CartoDB Positron, épuré)
+- **Style** : Tailwind CSS + Framer Motion
+- **Typographie** : Jost (via Google Fonts)
 - **Déploiement** : Docker (Build multi-étapes, mode standalone)
 
 ## 📍 État Actuel du Développement
 - [x] Initialisation du projet Next.js avec Tailwind.
 - [x] Hook de géolocalisation en temps réel (`src/hooks/useGeolocation.js`).
-- [x] Composant de carte interactive avec style épuré (`src/components/Map/DynamicMap.js`).
-- [x] Marqueur joueur animé et checkpoints mockés.
-- [x] UI Pokémon Go : Écran de chargement, barre de niveau, menu Pokéball.
-- [x] Dockerisation complète et fonctionnelle.
+- [x] Composant de carte interactive avec style "Modern Explorer".
+- [x] Marqueur joueur (pulsing dot) et checkpoints hexagonaux.
+- [x] UI Raffinée : Menu d'action central orange et interface épurée.
+- [x] Suppression Système XP : Retrait de la logique de niveau et d'XP (DB et Frontend).
+- [x] Connexion Database : Prisma v7.5 + Supabase (PostgreSQL) validée et fonctionnelle.
+- [x] Documentation : Vault Obsidian créé et structuré.
+- [x] Sécurité : Architecture 3-Tiers documentée et client singleton sécurisé.
+- [x] Intégration Supabase : MCP Server ajouté et Supabase Agent Skills installés.
 
 ## 📂 Structure des Fichiers Clés
 - `src/app/page.js` : Point d'entrée, gestion des données mockées et de l'état de chargement.
-- `src/components/Map/DynamicMap.js` : Cœur de l'intégration Leaflet, gestion des icônes SVG/Base64.
-- `src/hooks/useGeolocation.js` : Gestion propre du `navigator.geolocation` avec fallback sur Paris.
-- `Dockerfile` : Configuration de production optimisée (3 stages : deps, builder, runner).
+- `src/components/Map/DynamicMap.js` : Cœur de l'intégration Leaflet, gestion des icônes SVG.
+- `src/hooks/useGeolocation.js` : Gestion propre du `navigator.geolocation`.
 
 ## 💡 Décisions Techniques & Corrections
-1. **Alias de chemin** : Un fichier `jsconfig.json` a été ajouté pour supporter l'alias `@/` dans l'environnement Docker.
-2. **PostCSS** : `autoprefixer` a été ajouté explicitement aux `devDependencies` pour corriger une erreur de build Webpack dans Docker.
-3. **Docker Build** : Le `Dockerfile` utilise `npm install` au lieu de `npm ci` tant qu'un fichier `package-lock.json` n'est pas généré localement.
-4. **Icons** : Actuellement, les icônes sont des SVGs encodés en Base64 dans `DynamicMap.js` pour garantir l'affichage sans dépendances d'assets externes pour le moment.
+1. **Identité Visuelle** : Abandon du thème Pokémon Go au profit d'un design "Modern Explorer" (Orange #F97316, Teal #0D9488, Blue #2563EB).
+2. **Icons** : Utilisation d'icônes SVG intégrées pour une flexibilité maximale sans assets externes lourds.
+3. **Typography** : Passage à la police "Jost" pour un look premium et lisible sur mobile.
 
 ## 🚀 Prochaines Étapes
-1. Remplacer les SVGs par de vrais assets dans `public/icons/` (`player.png`, `checkpoint.png`).
-2. Implémenter la logique d'interaction avec les checkpoints (ex: distance minimum pour cliquer).
-3. Connecter un backend pour persister les données utilisateur et les positions des objets.
-4. Ajouter des sons et des retours haptiques pour renforcer l'immersion mobile.
+1. **Database** : Installer Prisma et configurer une connexion vers Supabase (PostgreSQL + PostGIS).
+2. **Logique Géo** : Implémenter la distance minimum pour interagir avec les checkpoints (rayon d'activation).
+3. **Persistance** : Créer le schéma de base pour les utilisateurs et l'historique d'exploration.
+4. **Haptique** : Ajouter des vibrations et retours sonores lors de la découverte de points.
