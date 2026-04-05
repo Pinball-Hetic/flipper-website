@@ -23,5 +23,5 @@ COPY --from=builder /app/apps/gateway ./apps/gateway
 
 WORKDIR /app/apps/gateway
 
-EXPOSE 3000
+EXPOSE 8881
 CMD ["node", "index.js"]

@@ -6,7 +6,7 @@ services:
       dockerfile: apps/gateway/Dockerfile
     container_name: pocket-maps-gateway
     ports:
-      - "3000:3000"
+      - "8881:8881"
     env_file: .env
     depends_on:
       - client
@@ -18,14 +18,13 @@ services:
       context: .
       dockerfile: apps/client/Dockerfile
     container_name: pocket-maps-client
-    # Port interne 3001, mais masqué par la gateway (non exposé vers l'extérieur sauf besoin)
     expose:
-      - "3001"
+      - "8888"
     env_file: .env
     environment:
       - NODE_ENV=production
-      - CLIENT_URL=http://client:3001
-      - SERVER_URL=http://server:4000
+      - CLIENT_URL=http://client:8888
+      - SERVER_URL=http://server:8882
     restart: always
 
   server:
@@ -34,7 +33,7 @@ services:
       dockerfile: apps/server/Dockerfile
     container_name: pocket-maps-server
     expose:
-      - "4000"
+      - "8882"
     env_file: .env
     environment:
       - NODE_ENV=production

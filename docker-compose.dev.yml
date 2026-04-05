@@ -6,14 +6,15 @@ services:
       dockerfile: apps/gateway/Dockerfile.dev
     container_name: pocket-maps-gateway-dev
     ports:
-      - "3000:3000"
+      - "8881:8881"
     volumes:
       - .:/app
       - /app/node_modules
     environment:
       - NODE_ENV=development
-      - SERVER_URL=http://server:4000
-      - CLIENT_URL=http://client:3001
+      - SERVER_URL=http://server:8882
+      - CLIENT_URL=http://client:8888
+      - GATEWAY_PORT=8881
     restart: unless-stopped
 
   client:
@@ -22,7 +23,7 @@ services:
       dockerfile: apps/client/Dockerfile.dev
     container_name: pocket-maps-client-dev
     ports:
-      - "3001:3001"
+      - "8888:8888"
     volumes:
       - .:/app
       - /app/node_modules
@@ -39,7 +40,7 @@ services:
       dockerfile: apps/server/Dockerfile.dev
     container_name: pocket-maps-server-dev
     ports:
-      - "4000:4000"
+      - "8882:8882"
     volumes:
       - .:/app
       - /app/node_modules
