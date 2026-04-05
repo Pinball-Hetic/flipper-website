@@ -4,10 +4,14 @@ import { useGeolocation } from "@/hooks/useGeolocation";
 import MapContainer from "@/components/Map/MapContainer";
 import { useEffect, useState } from "react";
 import { getCheckpoints } from "./actions";
+import { User, QrCode, ShoppingBag, Loader2 } from "lucide-react";
+import { ProfileModal } from "@/components/ProfileModal";
+import { toast } from "sonner";
 
 export default function Home() {
   const { position, loading, error, defaultPosition } = useGeolocation();
   const [checkpoints, setCheckpoints] = useState([]);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -16,6 +20,12 @@ export default function Home() {
     };
     fetchData();
   }, []);
+
+  const handleScanClick = () => {
+    toast.info("Scanner QR Code bientôt disponible !", {
+      description: "Cette fonctionnalité est en cours de développement.",
+    });
+  };
 
   if (loading) {
     return (
@@ -53,27 +63,29 @@ export default function Home() {
       <MapContainer position={position || defaultPosition} checkpoints={checkpoints} />
       
       {/* Bottom Menu Bar - 2026 Apple Spatial Style */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-5 p-2 bg-white/30 backdrop-blur-3xl border border-white/50 rounded-[2.5rem] shadow-spatial" style={{ backgroundImage: 'var(--glass-reflection)' }}>
-        <button className="size-14 rounded-[1.75rem] bg-white/40 backdrop-blur-md flex items-center justify-center border border-white/60 shadow-sm active:scale-90 transition-all hover:bg-white/60 text-slate-700">
-           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-             <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-           </svg>
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[2000] flex items-center gap-5 p-2 bg-white/30 backdrop-blur-3xl border border-white/50 rounded-[2.5rem] shadow-spatial" style={{ backgroundImage: 'var(--glass-reflection)' }}>
+        <button 
+          onClick={() => setIsProfileOpen(true)}
+          className="size-14 rounded-[1.75rem] bg-white/40 backdrop-blur-md flex items-center justify-center border border-white/60 shadow-sm active:scale-90 transition-all hover:bg-white/60 text-slate-700"
+        >
+           <User size={24} strokeWidth={2.5} />
         </button>
         
-        <button className="size-20 rounded-[2rem] bg-gradient-to-tr from-orange-500 to-orange-400 shadow-[0_15px_30px_-5px_rgba(249,115,22,0.4)] flex items-center justify-center border-[3px] border-white active:scale-95 transition-all group hover:rotate-12">
+        <button 
+          onClick={handleScanClick}
+          className="size-20 rounded-[2rem] bg-gradient-to-tr from-orange-500 to-orange-400 shadow-[0_15px_30px_-5px_rgba(249,115,22,0.4)] flex items-center justify-center border-[3px] border-white active:scale-95 transition-all group hover:rotate-12"
+        >
            <div className="size-10 flex items-center justify-center text-white">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2v20M2 12h20"/>
-              </svg>
+              <QrCode size={32} strokeWidth={3} />
            </div>
         </button>
 
         <button className="size-14 rounded-[1.75rem] bg-white/40 backdrop-blur-md flex items-center justify-center border border-white/60 shadow-sm active:scale-90 transition-all hover:bg-white/60 text-slate-700">
-           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-             <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
-           </svg>
+           <ShoppingBag size={24} strokeWidth={2.5} />
         </button>
       </div>
+
+      <ProfileModal isOpen={isProfileOpen} onOpenChange={setIsProfileOpen} />
     </div>
   );
 }

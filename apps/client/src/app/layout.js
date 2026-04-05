@@ -1,4 +1,5 @@
 import "./globals.css";
+import { Toaster } from "sonner";
 
 export const metadata = {
   title: "Pocket Maps - L'aventure vous attend",
@@ -17,6 +18,7 @@ export default function RootLayout({ children }) {
         <main className="h-screen w-screen overflow-hidden relative">
           {children}
         </main>
+        <Toaster position="top-center" />
       </body>
     </html>
   );
