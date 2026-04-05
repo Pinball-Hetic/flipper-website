@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String      @id @default(cuid())
+  name          String?
+  email         String      @unique
+  emailVerified Boolean     @default(false)
+  image         String?
+  lat           Float?
+  lng           Float?
+  location      Unsupported("geography(Point, 4326)")?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  // Auth relations
+  sessions      Session[]
+  accounts      Account[]
+  
+  // Game relations
+  visits        Visit[]
+  badges        UserBadge[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+
+  @@map("verification")
+}
+
+model Badge {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  icon        String?  // SVG name or path
+  criteria    Json?    
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  users       UserBadge[]
+
+  @@map("badge")
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  badgeId   String
+  unlockedAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id])
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+
+  @@unique([userId, badgeId])
+  @@map("user_badge")
+}
+
+model Checkpoint {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  lat         Float
+  lng         Float
+  location    Unsupported("geography(Point, 4326)")?
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  visits      Visit[]
+
+  @@map("checkpoint")
+}
+
+model Visit {
+  id           String     @id @default(cuid())
+  userId       String
+  checkpointId String
+  visitedAt    DateTime   @default(now())
+  
+  user         User       @relation(fields: [userId], references: [id])
+  checkpoint   Checkpoint @relation(fields: [checkpointId], references: [id])
+
+  @@unique([userId, checkpointId, visitedAt])
+  @@map("visit")
+}
