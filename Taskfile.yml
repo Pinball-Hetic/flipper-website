@@ -1,40 +1,77 @@
 version: '3'
 
 tasks:
-  # Development Tasks
-  docker:dev:up:
-    desc: Start the development environment
+  # 🛠️ Development (Local - hors Docker)
+  dev:
+    desc: "Start all services in development mode (Client, Server, Gateway)"
+    cmds:
+      - npm run dev
+
+  dev:client:
+    desc: "Start only the client"
+    cmds:
+      - npm run dev -w @pocket-maps/client
+
+  dev:server:
+    desc: "Start only the server"
+    cmds:
+      - npm run dev -w @pocket-maps/server
+
+  dev:gateway:
+    desc: "Start only the gateway"
+    cmds:
+      - npm run dev -w @pocket-maps/gateway
+
+  # 🗄️ Database (packages/database)
+  db:generate:
+    desc: "Generate Prisma Client"
+    cmds:
+      - npm run db:generate -w @pocket-maps/database
+
+  db:push:
+    desc: "Push schema changes to the database"
+    cmds:
+      - npm run db:push -w @pocket-maps/database
+
+  db:seed:
+    desc: "Seed the database"
+    cmds:
+      - npm run db:seed -w @pocket-maps/database
+
+  db:studio:
+    desc: "Open Prisma Studio"
+    cmds:
+      - npm run db:studio -w @pocket-maps/database
+
+  # 🐳 Docker (Orchestration)
+  up:
+    desc: "Start development environment (Docker)"
     cmds:
       - docker compose -f docker-compose.dev.yml up -d --build
 
-  docker:dev:down:
-    desc: Stop the development environment
+  down:
+    desc: "Stop development environment (Docker)"
     cmds:
       - docker compose -f docker-compose.dev.yml down
 
-  docker:dev:logs:
-    desc: View development logs
+  logs:
+    desc: "View development logs"
     cmds:
       - docker compose -f docker-compose.dev.yml logs -f
 
-  # Production Tasks
-  docker:prod:up:
-    desc: Start the production environment
+  prod:up:
+    desc: "Start production environment (Docker)"
     cmds:
       - docker compose up -d --build
 
-  docker:prod:down:
-    desc: Stop the production environment
+  prod:down:
+    desc: "Stop production environment (Docker)"
     cmds:
       - docker compose down
 
-  docker:prod:logs:
-    desc: View production logs
+  # 🧹 Maintenance
+  clean:
+    desc: "Remove all node_modules and build artifacts"
     cmds:
-      - docker compose logs -f
-
-  # Utils
-  docker:clean:
-    desc: Remove all stopped containers and unused images
-    cmds:
+      - rm -rf node_modules apps/*/node_modules apps/*/.next packages/*/node_modules
       - docker system prune -f

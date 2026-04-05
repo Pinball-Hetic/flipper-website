@@ -1,37 +1,22 @@
 {
-  "name": "flipper-website",
-  "version": "0.1.0",
+  "name": "pocket-maps-monorepo",
+  "version": "1.0.0",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
+    "dev": "concurrently \"npm run dev -w @pocket-maps/client\" \"npm run dev -w @pocket-maps/server\" \"npm run dev -w @pocket-maps/gateway\"",
+    "build": "npm run build --workspaces --if-present",
+    "start": "npm run start --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "db:push": "npm run db:push -w @pocket-maps/database",
+    "db:generate": "npm run db:generate -w @pocket-maps/database",
+    "db:seed": "npm run db:seed -w @pocket-maps/database",
     "docker:dev:up": "docker compose -f docker-compose.dev.yml up -d --build"
   },
-  "dependencies": {
-    "@better-auth/prisma-adapter": "^1.5.6",
-    "@prisma/adapter-pg": "^7.6.0",
-    "@prisma/client": "^7.5.0",
-    "better-auth": "^1.5.6",
-    "clsx": "^2.1.1",
-    "framer-motion": "^11.11.17",
-    "leaflet": "^1.9.4",
-    "lucide-react": "^0.454.0",
-    "next": "15.0.3",
-    "pg": "^8.20.0",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "react-leaflet": "^4.2.1",
-    "tailwind-merge": "^2.5.4"
-  },
   "devDependencies": {
-    "@types/pg": "^8.20.0",
-    "autoprefixer": "^10.4.20",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "15.0.3",
-    "postcss": "^8.4.47",
-    "prisma": "^7.5.0",
-    "tailwindcss": "^3.4.14"
+    "concurrently": "^9.1.0"
   }
 }
