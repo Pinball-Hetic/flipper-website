@@ -26,6 +26,14 @@
 
 ## 5 Avril 2026
 
+### 🛡️ Architecture : Better Auth & Répartition des services
+- **Décision** : Maintenir **Better Auth dans `apps/client`** en utilisant le pattern **BFF (Backend-for-Frontend)**.
+- **Raison** : Meilleure intégration avec Next.js 15 (Middleware, Server Actions), gestion native des cookies et sécurité simplifiée pour le web.
+- **Actions** : 
+    - Création du document `02_Architecture/Repartition_Responsabilites.md`.
+    - Définition des rôles : Client (BFF/Auth), Gateway (Sécurité/Routing), Server (Métier/Calculs).
+    - Validation du partage du `packages/database` entre tous les services.
+
 ### 🧹 Simplification : Suppression du système d'XP
 - **Décision** : Retrait du système de progression et de niveaux pour épurer l'expérience.
 - **Actions** : 
@@ -47,4 +55,28 @@
     - Implémentation d'un `MapController` pour gérer les mises à jour de vue sans ré-initialiser le conteneur.
     - Désactivation du `reactStrictMode` dans `next.config.js` pour éviter les conflits Leaflet en développement.
     - Ajout d'un ID stable au `MapContainer`.
+
+## 6 Avril 2026
+
+### 💎 Design : Glassmorphism Apple Spatial 2026
+- **Décision** : Adopter la tendance "Spatial UI" pour une immersion maximale.
+- **Actions** :
+    - Implémentation de `backdrop-blur-3xl` et de reflets lumineux dynamiques.
+    - Création de la classe utilitaire `.glass-panel` et tokens CSS pour le verre poli.
+    - Refonte de la barre de navigation et des popups en mode "flottant".
+    - Correction des erreurs de build Tailwind via l'intégration des tokens dans `tailwind.config.js`.
+
+### 🗄️ Backend : Intégration de la vraie base de données
+- **Décision** : Abandonner les mocks au profit de données réelles Supabase.
+- **Actions** :
+    - Mise à jour du schéma Prisma : Modèles `Machine` (Bornes de flipper) et `Score` (Leaderboards).
+    - Création d'un script de seeding intelligent (`prisma/seed.js`) automatisé dans le `Dockerfile.dev`.
+    - Implémentation de Server Actions (`src/app/actions.js`) pour le fetch temps réel.
+
+### 🏆 Feature : Scoreboards & Checkpoints Dynamiques
+- **Décision** : Transformer les points d'intérêt en bornes de jeu interactives.
+- **Actions** :
+    - Ajout d'icônes de carte différenciées par type (Restaurant, Gare, Culture).
+    - Création du `ScoreboardModal` : Panneau spatial affichant les records par machine.
+    - Refonte ergonomique de la popup : Espacements optimisés pour le tactile et hiérarchie visuelle claire.
 
