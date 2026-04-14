@@ -1,4 +1,0 @@
-# Secrets — exclus des outils Gemini CLI (redémarrer la session après modification)
-.env
-.env.*
-!.env.example
