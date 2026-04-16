@@ -28,10 +28,14 @@ services:
       - .:/app
       - /app/node_modules
       - /app/apps/client/.next
+    env_file:
+      - path: .env
+        required: false
     environment:
       - NODE_ENV=development
       - WATCHPACK_POLLING=true
       - NEXT_TELEMETRY_DISABLED=1
+      - NEXT_PUBLIC_SERVER_URL=http://localhost:8882
     restart: unless-stopped
 
   server:
@@ -44,6 +48,9 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+    env_file:
+      - path: .env
+        required: false
     environment:
       - NODE_ENV=development
     restart: unless-stopped
