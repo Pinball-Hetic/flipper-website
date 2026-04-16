@@ -1,15 +1,36 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import type { CheckpointWithPosition, MachineDTO } from "@pocket-maps/shared";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import { fetchJson } from "@/lib/fetch-json";
 
-export default function ScoreboardModal({ isOpen, onClose, checkpoint }) {
+const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:8882";
+
+interface ScoreboardModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  checkpoint: CheckpointWithPosition | null;
+}
+
+export default function ScoreboardModal({ isOpen, onClose, checkpoint }: ScoreboardModalProps) {
+  const { data: machines, isLoading } = useQuery<MachineDTO[]>({
+    queryKey: ["checkpoint-scores", checkpoint?.id],
+    queryFn: () =>
+      fetchJson<MachineDTO[]>(
+        `${SERVER_URL}/api/checkpoints/${checkpoint!.id}/scores`,
+      ),
+    enabled: !!checkpoint?.id && isOpen,
+    retry: 2,
+  });
+
   if (!checkpoint) return null;
 
   return (
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-3000 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          {/* Backdrop avec flou progressif */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -18,7 +39,6 @@ export default function ScoreboardModal({ isOpen, onClose, checkpoint }) {
             className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
           />
 
-          {/* Modal Content - Glassmorphism Spatial 2026 */}
           <motion.div
             initial={{ y: "100%", scale: 0.95, opacity: 0 }}
             animate={{ y: 0, scale: 1, opacity: 1 }}
@@ -27,12 +47,10 @@ export default function ScoreboardModal({ isOpen, onClose, checkpoint }) {
             className="relative w-full max-w-lg bg-white/45 backdrop-blur-3xl rounded-t-[3rem] sm:rounded-[3rem] border border-white/50 shadow-spatial overflow-hidden flex flex-col max-h-[90vh]"
             style={{ backgroundImage: 'var(--glass-reflection)' }}
           >
-            {/* Header avec indicateur de grab spatial */}
             <div className="p-8 pb-4 relative">
               <div className="absolute top-3 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-slate-400/20 rounded-full" />
-              
-              {/* Floating Close Button - Modern Spatial UX */}
-              <button 
+
+              <button
                 onClick={onClose}
                 aria-label="Fermer"
                 className="absolute top-6 right-6 z-10 size-11 rounded-2xl bg-white/60 backdrop-blur-xl border border-white/80 flex items-center justify-center text-slate-500 hover:bg-white hover:text-slate-900 active:scale-90 transition-all shadow-spatial group"
@@ -58,7 +76,6 @@ export default function ScoreboardModal({ isOpen, onClose, checkpoint }) {
               </div>
             </div>
 
-            {/* Content / Scoreboards */}
             <div className="px-8 pb-10 overflow-y-auto custom-scrollbar">
               <h3 className="text-lg font-black text-slate-900 mb-6 flex items-center gap-2 tracking-tight">
                 <div className="size-8 rounded-xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
@@ -69,34 +86,38 @@ export default function ScoreboardModal({ isOpen, onClose, checkpoint }) {
                 Tableau des Scores
               </h3>
 
-              {checkpoint.machines && checkpoint.machines.length > 0 ? (
+              {isLoading ? (
+                <div className="flex items-center justify-center py-16">
+                  <Loader2 className="animate-spin text-orange-500" size={32} />
+                </div>
+              ) : machines && machines.length > 0 ? (
                 <div className="space-y-6">
-                  {checkpoint.machines.map((machine) => (
+                  {machines.map((machine) => (
                     <div key={machine.id} className="bg-white/40 backdrop-blur-md rounded-4xl p-6 border border-white/60 shadow-xs relative overflow-hidden group">
                       <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
-                           <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
+                          <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
                         </svg>
                       </div>
-                      
+
                       <h4 className="font-black text-slate-900 mb-5 uppercase tracking-widest text-xs flex items-center justify-between">
                         {machine.name}
                         <span className="text-[9px] bg-slate-900/5 px-2.5 py-1 rounded-full text-slate-600 border border-slate-900/10">SYSTEM_FLIPPER</span>
                       </h4>
-                      
+
                       <div className="space-y-2.5">
                         {machine.scores && machine.scores.length > 0 ? (
                           machine.scores.map((score, index) => (
                             <div key={score.id} className="flex items-center justify-between bg-white/60 backdrop-blur-xs p-4 rounded-2xl border border-white shadow-xs hover:translate-x-1 transition-transform">
                               <div className="flex items-center gap-4">
                                 <span className={`size-8 rounded-xl flex items-center justify-center font-black text-xs shadow-inner ${
-                                  index === 0 ? 'bg-orange-500 text-white' : 
-                                  index === 1 ? 'bg-slate-300 text-slate-800' : 
+                                  index === 0 ? 'bg-orange-500 text-white' :
+                                  index === 1 ? 'bg-slate-300 text-slate-800' :
                                   index === 2 ? 'bg-orange-100 text-orange-800' : 'bg-slate-100/50 text-slate-500'
                                 }`}>
                                   {index + 1}
                                 </span>
-                                <span className="font-bold text-slate-800 tracking-tight">{score.user?.name || "Anonyme"}</span>
+                                <span className="font-bold text-slate-800 tracking-tight">{score.user?.name ?? "Anonyme"}</span>
                               </div>
                               <span className="font-mono font-black text-orange-600 text-lg">
                                 {score.value.toLocaleString()}
@@ -116,9 +137,10 @@ export default function ScoreboardModal({ isOpen, onClose, checkpoint }) {
                 </div>
               ) : (
                 <div className="text-center py-16 bg-white/20 rounded-explorer border border-dashed border-white/50">
-                   <p className="text-slate-500 font-bold uppercase tracking-[0.2em] text-xs">Waiting for machine...</p>
+                  <p className="text-slate-500 font-bold uppercase tracking-[0.2em] text-xs">Waiting for machine...</p>
                 </div>
               )}
+
             </div>
           </motion.div>
         </div>

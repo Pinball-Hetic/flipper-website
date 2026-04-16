@@ -5,39 +5,33 @@ import { useState, useEffect } from "react";
 const DEFAULT_POSITION = [48.8566, 2.3522]; // Paris
 
 export function useGeolocation() {
-  const [position, setPosition] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [state, setState] = useState({ position: null, loading: true, error: null });
 
   useEffect(() => {
+    const handleSuccess = (pos) => {
+      const { latitude, longitude } = pos.coords;
+      setState({ position: [latitude, longitude], loading: false, error: null });
+    };
+
+    const handleError = () => {
+      setState({
+        position: DEFAULT_POSITION,
+        loading: false,
+        error: "Accès à la position refusé. Utilisation de la position par défaut.",
+      });
+    };
+
     if (!navigator.geolocation) {
-      setError("La géolocalisation n'est pas supportée par votre navigateur.");
-      setPosition(DEFAULT_POSITION);
-      setLoading(false);
+      handleError();
       return;
     }
 
-    const handleSuccess = (pos) => {
-      const { latitude, longitude } = pos.coords;
-      setPosition([latitude, longitude]);
-      setLoading(false);
-    };
-
-    const handleError = (err) => {
-      console.error("Geolocation error:", err);
-      setError("Accès à la position refusé. Utilisation de la position par défaut.");
-      setPosition(DEFAULT_POSITION);
-      setLoading(false);
-    };
-
-    // Obtenir la position initiale
     navigator.geolocation.getCurrentPosition(handleSuccess, handleError, {
       enableHighAccuracy: true,
       timeout: 5000,
       maximumAge: 0,
     });
 
-    // Surveiller les changements de position
     const watchId = navigator.geolocation.watchPosition(handleSuccess, handleError, {
       enableHighAccuracy: true,
     });
@@ -45,5 +39,5 @@ export function useGeolocation() {
     return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
-  return { position, loading, error, defaultPosition: DEFAULT_POSITION };
+  return { ...state, defaultPosition: DEFAULT_POSITION };
 }

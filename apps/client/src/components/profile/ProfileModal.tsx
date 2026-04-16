@@ -8,8 +8,18 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { LogOut, User as UserIcon, Mail, Lock, Loader2, X, ChevronRight } from "lucide-react";
+import type { UserStatsDTO } from "@pocket-maps/shared";
+import { useQuery } from "@tanstack/react-query";
+import { fetchJson } from "@/lib/fetch-json";
 
-export function ProfileModal({ isOpen, onOpenChange }) {
+const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:8882";
+
+interface ProfileModalProps {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function ProfileModal({ isOpen, onOpenChange }: ProfileModalProps) {
   const { data: session, isPending } = authClient.useSession();
   const [isSignIn, setIsSignIn] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -19,7 +29,16 @@ export function ProfileModal({ isOpen, onOpenChange }) {
   const [password, setPassword] = React.useState("");
   const [name, setName] = React.useState("");
 
-  const handleAuth = async (e) => {
+  const userId = session?.user?.id;
+  const { data: stats } = useQuery<UserStatsDTO>({
+    queryKey: ["user-stats", userId],
+    queryFn: () =>
+      fetchJson<UserStatsDTO>(`${SERVER_URL}/api/users/${userId}/stats`),
+    enabled: !!userId,
+    retry: 2,
+  });
+
+  const handleAuth = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -54,7 +73,7 @@ export function ProfileModal({ isOpen, onOpenChange }) {
           }
         });
       }
-    } catch (error) {
+    } catch {
       toast.error("Une erreur est survenue");
     } finally {
       setIsLoading(false);
@@ -68,7 +87,7 @@ export function ProfileModal({ isOpen, onOpenChange }) {
         provider: "google",
         callbackURL: "/",
       });
-    } catch (error) {
+    } catch {
       toast.error("Erreur de connexion avec Google");
       setIsGoogleLoading(false);
     }
@@ -89,16 +108,13 @@ export function ProfileModal({ isOpen, onOpenChange }) {
 
   return (
     <div className="fixed inset-0 z-5000 flex items-center justify-center p-4">
-      {/* Overlay Backdrop */}
-      <div 
+      <div
         className="absolute inset-0 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300"
         onClick={() => onOpenChange(false)}
       />
 
-      {/* Modal Content */}
       <div className="relative w-full max-w-[420px] glass-panel border-none rounded-explorer shadow-spatial overflow-hidden animate-in zoom-in-95 fade-in duration-300">
-        {/* Close Button */}
-        <button 
+        <button
           onClick={() => onOpenChange(false)}
           className="absolute top-6 right-6 z-10 size-10 flex items-center justify-center rounded-2xl bg-white/20 hover:bg-white/40 border border-white/40 text-slate-700 backdrop-blur-md transition-all active:scale-90"
         >
@@ -123,7 +139,7 @@ export function ProfileModal({ isOpen, onOpenChange }) {
             <div className="flex flex-col gap-8">
               <div className="flex items-center gap-5 p-4 bg-white/40 rounded-[1.75rem] border border-white/60">
                 <Avatar className="size-16 border-2 border-white shadow-xs">
-                  <AvatarImage src={session.user.image} />
+                  <AvatarImage src={session.user.image ?? undefined} />
                   <AvatarFallback className="bg-orange-500 text-white font-black text-xl">
                     {session.user.name?.[0]}
                   </AvatarFallback>
@@ -135,18 +151,22 @@ export function ProfileModal({ isOpen, onOpenChange }) {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                 <div className="p-5 bg-teal-500/10 border border-teal-500/20 rounded-3xl">
-                    <span className="block text-[10px] font-black uppercase tracking-widest text-teal-600 mb-1">Checkpoints</span>
-                    <span className="text-2xl font-black text-teal-700">12</span>
-                 </div>
-                 <div className="p-5 bg-blue-500/10 border border-blue-500/20 rounded-3xl">
-                    <span className="block text-[10px] font-black uppercase tracking-widest text-blue-600 mb-1">Badge Rank</span>
-                    <span className="text-2xl font-black text-blue-700">#4</span>
-                 </div>
+                <div className="p-5 bg-teal-500/10 border border-teal-500/20 rounded-3xl">
+                  <span className="block text-[10px] font-black uppercase tracking-widest text-teal-600 mb-1">Visites</span>
+                  <span className="text-2xl font-black text-teal-700">
+                    {stats ? stats.visitCount : <Loader2 className="animate-spin inline" size={20} />}
+                  </span>
+                </div>
+                <div className="p-5 bg-blue-500/10 border border-blue-500/20 rounded-3xl">
+                  <span className="block text-[10px] font-black uppercase tracking-widest text-blue-600 mb-1">Top Score</span>
+                  <span className="text-2xl font-black text-blue-700">
+                    {stats ? (stats.topScore ? stats.topScore.toLocaleString() : "—") : <Loader2 className="animate-spin inline" size={20} />}
+                  </span>
+                </div>
               </div>
 
-              <Button 
-                variant="destructive" 
+              <Button
+                variant="destructive"
                 onClick={handleSignOut}
                 className="w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest gap-3 shadow-lg shadow-red-500/20"
               >
@@ -156,7 +176,7 @@ export function ProfileModal({ isOpen, onOpenChange }) {
             </div>
           ) : (
             <div className="flex flex-col gap-6">
-              <Button 
+              <Button
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={isGoogleLoading}
@@ -188,7 +208,7 @@ export function ProfileModal({ isOpen, onOpenChange }) {
                     <Label className="ml-1 text-[11px] font-black uppercase tracking-widest text-slate-400">Nom</Label>
                     <div className="relative">
                       <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                      <Input 
+                      <Input
                         className="h-14 pl-12 rounded-2xl bg-white/50 border-white/60 focus:bg-white transition-all shadow-xs"
                         placeholder="Votre nom"
                         value={name}
@@ -198,12 +218,12 @@ export function ProfileModal({ isOpen, onOpenChange }) {
                     </div>
                   </div>
                 )}
-                
+
                 <div className="space-y-1.5">
                   <Label className="ml-1 text-[11px] font-black uppercase tracking-widest text-slate-400">Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <Input 
+                    <Input
                       type="email"
                       className="h-14 pl-12 rounded-2xl bg-white/50 border-white/60 focus:bg-white transition-all shadow-xs"
                       placeholder="email@example.com"
@@ -218,7 +238,7 @@ export function ProfileModal({ isOpen, onOpenChange }) {
                   <Label className="ml-1 text-[11px] font-black uppercase tracking-widest text-slate-400">Mot de passe</Label>
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <Input 
+                    <Input
                       type="password"
                       className="h-14 pl-12 rounded-2xl bg-white/50 border-white/60 focus:bg-white transition-all shadow-xs"
                       placeholder="••••••••"
@@ -229,7 +249,7 @@ export function ProfileModal({ isOpen, onOpenChange }) {
                   </div>
                 </div>
 
-                <Button 
+                <Button
                   type="submit"
                   disabled={isLoading}
                   className="w-full h-14 mt-4 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest gap-2 shadow-xl shadow-orange-500/25 transition-all"
@@ -238,7 +258,7 @@ export function ProfileModal({ isOpen, onOpenChange }) {
                   {!isLoading && <ChevronRight size={18} />}
                 </Button>
 
-                <button 
+                <button
                   type="button"
                   onClick={() => setIsSignIn(!isSignIn)}
                   className="text-center text-xs font-black uppercase tracking-widest text-slate-400 hover:text-orange-500 transition-colors py-2"

@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 tasks:
   # 🛠️ Development (Local - hors Docker)
@@ -21,6 +21,12 @@ tasks:
     desc: "Start only the gateway"
     cmds:
       - npm run dev -w @pocket-maps/gateway
+
+  # 🔍 Qualité
+  lint:
+    desc: "Vérifier les erreurs ESLint du client"
+    cmds:
+      - npm run lint -w @pocket-maps/client
 
   # 🗄️ Database (packages/database)
   db:generate:

@@ -1,9 +1,11 @@
 import "./globals.css";
 import { Toaster } from "sonner";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 
 export const metadata = {
   title: "Pocket Maps - L'aventure vous attend",
-  description: "Explorez le monde qui vous entoure avec une nouvelle perspective.",
+  description:
+    "Explorez le monde qui vous entoure avec une nouvelle perspective.",
 };
 
 export default function RootLayout({ children }) {
@@ -11,13 +13,22 @@ export default function RootLayout({ children }) {
     <html lang="fr">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body className="antialiased">
-        <main className="h-screen w-screen overflow-hidden relative">
-          {children}
-        </main>
+        <QueryProvider>
+          <main className="h-screen w-screen overflow-hidden relative">
+            {children}
+          </main>
+        </QueryProvider>
         <Toaster position="top-center" />
       </body>
     </html>
