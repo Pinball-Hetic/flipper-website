@@ -4,9 +4,9 @@ import { defineConfig } from "prisma/config";
 // On force le chargement du fichier .env pour écraser les variables d'environnement système (placeholders)
 config({ override: true });
 
-const rawUrl = process.env.DIRECT_URL || "";
-const formattedUrl = rawUrl.startsWith("postgresql://") 
-  ? rawUrl.replace("postgresql://", "postgres://") 
+const rawUrl = process.env.DIRECT_URL || process.env.DATABASE_URL || "postgresql://localhost:5432/build";
+const formattedUrl = rawUrl.startsWith("postgresql://")
+  ? rawUrl.replace("postgresql://", "postgres://")
   : rawUrl;
 
 export default defineConfig({
