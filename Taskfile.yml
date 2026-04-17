@@ -34,6 +34,16 @@ tasks:
     cmds:
       - npm run db:generate -w @pocket-maps/database
 
+  db:migrate:
+    desc: "Run Prisma migrations (dev) — requires DATABASE_URL"
+    cmds:
+      - npm run db:migrate -w @pocket-maps/database -- --name {{.NAME}}
+
+  db:migrate:deploy:
+    desc: "Apply pending migrations (production)"
+    cmds:
+      - npm run db:migrate:deploy -w @pocket-maps/database
+
   db:push:
     desc: "Push schema changes to the database"
     cmds:
@@ -56,9 +66,14 @@ tasks:
       - docker compose -f docker-compose.dev.yml up -d --build
 
   down:
-    desc: "Stop development environment (Docker)"
+    desc: "Stop development environment (Docker, keeps volumes)"
     cmds:
       - docker compose -f docker-compose.dev.yml down
+
+  down:clean:
+    desc: "Stop development environment and DELETE volumes (destructive)"
+    cmds:
+      - docker compose -f docker-compose.dev.yml down -v
 
   logs:
     desc: "View development logs"
