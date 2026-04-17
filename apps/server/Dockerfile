@@ -17,16 +17,19 @@ COPY . .
 # Generer le client Prisma
 RUN npm run db:generate -w @pocket-maps/database
 
+# Compiler le serveur TypeScript
+RUN npx tsc -p apps/server/tsconfig.json
+
 # Stage 3: Runner
 FROM node:22-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV production
 
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/apps/server ./apps/server
+COPY --from=builder /app/apps/server/dist ./apps/server/dist
 COPY --from=builder /app/packages/database ./packages/database
 
 WORKDIR /app/apps/server
 
 EXPOSE 8882
-CMD ["node", "index.js"]
+CMD ["node", "dist/src/index.js"]

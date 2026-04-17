@@ -2,15 +2,29 @@
   "name": "@pocket-maps/server",
   "version": "1.0.0",
   "private": true,
-  "main": "index.js",
+  "main": "src/index.ts",
   "scripts": {
-    "dev": "node --watch index.js",
-    "start": "node index.js"
+    "dev": "tsx --watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "test": "vitest run"
   },
   "dependencies": {
     "@pocket-maps/database": "*",
     "cors": "^2.8.5",
     "dotenv": "17.4.1",
-    "express": "5.2.1"
+    "express": "5.2.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "tsx": "^4.19.3",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.2"
   }
 }
