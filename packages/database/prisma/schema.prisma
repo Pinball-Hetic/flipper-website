@@ -130,7 +130,8 @@ model Machine {
   createdAt    DateTime   @default(now())
   
   // Relations
-  scores       Score[]
+  scores         Score[]
+  pendingScores  PendingScore[]
 
   @@map("machine")
 }
@@ -141,12 +142,42 @@ model Score {
   userId    String
   machineId String
   createdAt DateTime @default(now())
-  
+
   user      User     @relation(fields: [userId], references: [id])
   machine   Machine  @relation(fields: [machineId], references: [id])
 
+  pendingScore  PendingScore?
+
   @@index([machineId, value(sort: Desc)])
   @@map("score")
+}
+
+model PendingScore {
+  id           String             @id @default(cuid())
+  gameId       String             @unique
+  claimCode    String             @unique
+  borneId      String
+  score        Int
+  timestamp    DateTime
+  expiresAt    DateTime
+  status       PendingScoreStatus @default(UNCLAIMED)
+  claimedAt    DateTime?
+  claimedBy    String?
+
+  finalScoreId String?            @unique
+  finalScore   Score?             @relation(fields: [finalScoreId], references: [id])
+
+  machine      Machine            @relation(fields: [borneId], references: [id])
+
+  @@index([status, expiresAt])
+  @@index([claimCode])
+  @@map("pending_score")
+}
+
+enum PendingScoreStatus {
+  UNCLAIMED
+  CLAIMED
+  EXPIRED
 }
 
 model Visit {
