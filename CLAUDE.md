@@ -59,9 +59,12 @@ Quand l'utilisateur dit "code review", "review et commit", "c'est bon on commit"
 
 1. Invoquer l'agent `code-reviewer` sur les fichiers modifiés
 2. Corriger ce que l'agent signale
-3. Invoquer le skill `/git-commit` pour chaque changement atomique
+3. Mettre à jour le knowledge graph : `graphify update .`
 4. Mettre à jour `Pinball-website-brain/03_Journal_de_Bord/` avec une entrée de session
-5. Ne pas pusher
+5. Si bug corrigé (3+ fichiers) → créer une entrée dans `Pinball-website-brain/05_Bugs_Resolus/`
+6. Si nouvelle décision d'architecture → mettre à jour `Pinball-website-brain/02_Architecture/`
+7. Invoquer le skill `/git-commit` pour chaque changement atomique
+8. Ne pas pusher
 
 ---
 
