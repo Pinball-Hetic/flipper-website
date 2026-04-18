@@ -11,7 +11,7 @@ export class UserController {
       new PrismaVisitRepository(),
     );
     try {
-      const stats = await useCase.execute({ userId: req.params.id });
+      const stats = await useCase.execute({ userId: req.params.id as string });
       res.json(stats);
     } catch (err) {
       if (err instanceof ValidationError) {

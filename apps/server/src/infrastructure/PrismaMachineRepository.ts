@@ -35,9 +35,11 @@ export class PrismaMachineRepository implements IMachineRepository {
     return rows.map((r) => ({
       id: r.id,
       name: r.name,
-      topScores: r.scores.map((s) => ({
+      checkpointId: r.checkpointId,
+      scores: r.scores.map((s) => ({
+        id: s.id,
         value: s.value,
-        userName: s.user?.name ?? null,
+        user: s.user ?? null,
       })),
     }));
   }

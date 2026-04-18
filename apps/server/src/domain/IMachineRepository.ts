@@ -9,7 +9,8 @@ export interface Machine {
 export interface MachineWithScores {
   id: string;
   name: string;
-  topScores: Array<{ value: number; userName: string | null }>;
+  checkpointId: string;
+  scores: Array<{ id: string; value: number; user: { name: string | null } | null }>;
 }
 
 export interface IMachineRepository {

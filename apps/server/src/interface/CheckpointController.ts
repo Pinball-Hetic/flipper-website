@@ -7,7 +7,7 @@ export class CheckpointController {
   static async getScores(req: Request, res: Response): Promise<void> {
     const useCase = new GetCheckpointScores(new PrismaMachineRepository());
     try {
-      const scoreboard = await useCase.execute({ checkpointId: req.params.id });
+      const scoreboard = await useCase.execute({ checkpointId: req.params.id as string });
       res.json(scoreboard);
     } catch (err) {
       if (err instanceof ValidationError) {
