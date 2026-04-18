@@ -29,6 +29,7 @@ const makeScoreRepo = (): IScoreRepository => ({
   save: vi.fn().mockImplementation((_data) => Promise.resolve(makeScore("score-" + Math.random()))),
   saveFromPending: vi.fn(),
   existsRecentScore: vi.fn().mockResolvedValue(false),
+  findTopByUser: vi.fn().mockResolvedValue(null),
 });
 
 const makeNameGenerator = (): IAnonymousNameGenerator => ({

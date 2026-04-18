@@ -17,11 +17,13 @@ const makeScoreRepo = (score?: Score, isDuplicate = false): IScoreRepository => 
   save: vi.fn().mockResolvedValue(score ?? makeScore()),
   saveFromPending: vi.fn(),
   existsRecentScore: vi.fn().mockResolvedValue(isDuplicate),
+  findTopByUser: vi.fn().mockResolvedValue(null),
 });
 
 const makeMachineRepo = (exists = true): IMachineRepository => ({
   existsById: vi.fn().mockResolvedValue(exists),
   findAll: vi.fn().mockResolvedValue([]),
+  findWithScoresByCheckpoint: vi.fn().mockResolvedValue([]),
 });
 
 const validInput = {

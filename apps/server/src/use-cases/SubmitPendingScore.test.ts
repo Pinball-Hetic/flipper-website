@@ -32,6 +32,7 @@ const makePendingRepo = (existing: PendingScore | null = null): IPendingScoreRep
 const makeMachineRepo = (exists = true): IMachineRepository => ({
   existsById: vi.fn().mockResolvedValue(exists),
   findAll: vi.fn().mockResolvedValue([]),
+  findWithScoresByCheckpoint: vi.fn().mockResolvedValue([]),
 });
 
 const validInput = {
