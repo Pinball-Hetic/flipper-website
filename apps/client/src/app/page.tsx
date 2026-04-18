@@ -5,13 +5,15 @@ import MapContainer from "@/components/Map/MapContainer";
 import { useState } from "react";
 import { getCheckpoints } from "./actions/checkpoints";
 import { User, QrCode, ShoppingBag, Loader2 } from "lucide-react";
-import { ProfileModal } from "@/components/profile/ProfileModal";
 import { toast } from "sonner";
+import { ProfileModal } from "@/components/profile/ProfileModal";
+import { ClaimModal } from "@/components/claim/ClaimModal";
 import { useQuery } from "@tanstack/react-query";
 
 export default function Home() {
   const { position, loading, error, defaultPosition } = useGeolocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isClaimOpen, setIsClaimOpen] = useState(false);
 
   const {
     data: checkpoints = [],
@@ -24,12 +26,6 @@ export default function Home() {
     queryFn: () => getCheckpoints(),
     retry: 2,
   });
-
-  const handleScanClick = () => {
-    toast.info("Scanner QR Code bientôt disponible !", {
-      description: "Cette fonctionnalité est en cours de développement.",
-    });
-  };
 
   const mapPosition = position ?? defaultPosition;
 
@@ -94,7 +90,7 @@ export default function Home() {
         </button>
 
         <button
-          onClick={handleScanClick}
+          onClick={() => setIsClaimOpen(true)}
           className="size-20 rounded-4xl bg-linear-to-tr from-orange-500 to-orange-400 shadow-[0_15px_30px_-5px_rgba(249,115,22,0.4)] flex items-center justify-center border-[3px] border-white active:scale-95 transition-all group hover:rotate-12"
         >
           <div className="size-10 flex items-center justify-center text-white">
@@ -102,12 +98,16 @@ export default function Home() {
           </div>
         </button>
 
-        <button className="size-14 rounded-[1.75rem] bg-white/40 backdrop-blur-md flex items-center justify-center border border-white/60 shadow-xs active:scale-90 transition-all hover:bg-white/60 text-slate-700">
+        <button
+          onClick={() => toast.info("Boutique — bientôt disponible")}
+          className="size-14 rounded-[1.75rem] bg-white/40 backdrop-blur-md flex items-center justify-center border border-white/60 shadow-xs active:scale-90 transition-all hover:bg-white/60 text-slate-700"
+        >
           <ShoppingBag size={24} strokeWidth={2.5} />
         </button>
       </div>
 
       <ProfileModal isOpen={isProfileOpen} onOpenChange={setIsProfileOpen} />
+      <ClaimModal isOpen={isClaimOpen} onClose={() => setIsClaimOpen(false)} />
     </div>
   );
 }

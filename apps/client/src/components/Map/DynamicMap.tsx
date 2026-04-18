@@ -6,6 +6,7 @@ import "leaflet/dist/leaflet.css";
 import { createPlayerIcon, createCheckpointIcon } from "./Icons";
 import type { CheckpointWithPosition } from "@pocket-maps/shared";
 import ScoreboardModal from "@/components/scoreboard/ScoreboardModal";
+import { toast } from "sonner";
 
 function MapController({
   position,
@@ -146,7 +147,7 @@ export default function DynamicMap({ position, checkpoints, geoLoading }: Props)
       />
 
       <div className="absolute top-6 left-6 right-6 z-1000 flex justify-end items-center pointer-events-none">
-        <button className="size-12 rounded-2xl bg-white/45 backdrop-blur-2xl shadow-spatial flex items-center justify-center border border-white/50 text-slate-700 hover:bg-white transition-all pointer-events-auto active:scale-90" style={{ backgroundImage: 'var(--glass-reflection)' }}>
+        <button onClick={() => toast.info("Filtres — bientôt disponible")} className="size-12 rounded-2xl bg-white/45 backdrop-blur-2xl shadow-spatial flex items-center justify-center border border-white/50 text-slate-700 hover:bg-white transition-all pointer-events-auto active:scale-90" style={{ backgroundImage: 'var(--glass-reflection)' }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
             <line x1="9" y1="3" x2="9" y2="21" />
