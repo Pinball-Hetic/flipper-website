@@ -5,7 +5,10 @@ WORKDIR /app
 # Copier les manifests
 COPY package.json package-lock.json* ./
 COPY apps/client/package.json ./apps/client/
+COPY apps/server/package.json ./apps/server/
+COPY apps/gateway/package.json ./apps/gateway/
 COPY packages/database/package.json ./packages/database/
+COPY packages/shared/package.json ./packages/shared/
 
 # Copier les dépendances locales
 COPY packages/database ./packages/database
