@@ -10,16 +10,19 @@ datasource db {
 }
 
 model User {
-  id            String      @id @default(cuid())
-  name          String?
-  email         String      @unique
-  emailVerified Boolean     @default(false)
-  image         String?
-  lat           Float?
-  lng           Float?
-  location      Unsupported("geography(Point, 4326)")?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id              String      @id @default(cuid())
+  name            String?
+  email           String      @unique
+  emailVerified   Boolean     @default(false)
+  image           String?
+  lat             Float?
+  lng             Float?
+  location        Unsupported("geography(Point, 4326)")?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  pseudo          String?     @unique
+  pseudoLower     String?     @unique
+  pseudoUpdatedAt DateTime?
   
   // Auth relations
   sessions      Session[]
