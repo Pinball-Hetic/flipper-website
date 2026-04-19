@@ -10,7 +10,7 @@ export interface MachineWithScores {
   id: string;
   name: string;
   checkpointId: string;
-  scores: Array<{ id: string; value: number; user: { name: string | null } | null }>;
+  scores: Array<{ id: string; value: number; user: { name: string | null; pseudo: string | null } | null }>;
 }
 
 export interface IMachineRepository {

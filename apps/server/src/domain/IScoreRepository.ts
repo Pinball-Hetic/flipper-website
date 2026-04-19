@@ -16,4 +16,5 @@ export interface IScoreRepository {
 
   existsRecentScore(machineId: string, pseudo: string, withinSeconds: number): Promise<boolean>;
   findTopByUser(userId: string): Promise<number | null>;
+  existsByPseudo(pseudoLower: string): Promise<boolean>;
 }

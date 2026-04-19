@@ -77,4 +77,16 @@ export class PrismaScoreRepository implements IScoreRepository {
     });
     return row?.value ?? null;
   }
+
+  async existsByPseudo(pseudoLower: string): Promise<boolean> {
+    const count = await prisma.score.count({
+      where: {
+        user: {
+          pseudoLower: null,
+          name: { equals: pseudoLower, mode: "insensitive" },
+        },
+      },
+    });
+    return count > 0;
+  }
 }

@@ -28,7 +28,7 @@ export class PrismaMachineRepository implements IMachineRepository {
         scores: {
           orderBy: { value: "desc" },
           take: 5,
-          include: { user: { select: { name: true } } },
+          include: { user: { select: { name: true, pseudo: true } } },
         },
       },
     });
@@ -39,7 +39,7 @@ export class PrismaMachineRepository implements IMachineRepository {
       scores: r.scores.map((s) => ({
         id: s.id,
         value: s.value,
-        user: s.user ?? null,
+        user: s.user ? { name: s.user.name, pseudo: s.user.pseudo } : null,
       })),
     }));
   }
