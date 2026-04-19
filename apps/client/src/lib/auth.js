@@ -19,4 +19,18 @@ export const auth = betterAuth({
             clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
         },
     },
+    user: {
+        additionalFields: {
+            pseudo: {
+                type: "string",
+                required: false,
+                input: false,
+            },
+            pseudoUpdatedAt: {
+                type: "date",
+                required: false,
+                input: false,
+            },
+        },
+    },
 });

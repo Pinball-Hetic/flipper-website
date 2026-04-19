@@ -7,12 +7,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { LogOut, User as UserIcon, Mail, Lock, Loader2, X, ChevronRight } from "lucide-react";
+import {
+  LogOut,
+  User as UserIcon,
+  Mail,
+  Lock,
+  Loader2,
+  X,
+  ChevronRight,
+  AtSign,
+} from "lucide-react";
+import { PseudoForm } from "@/components/pseudo/PseudoForm";
 import type { UserStatsDTO } from "@pocket-maps/shared";
 import { useQuery } from "@tanstack/react-query";
 import { fetchJson } from "@/lib/fetch-json";
 
-const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:8882";
+const SERVER_URL =
+  process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:8882";
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -23,6 +34,15 @@ export function ProfileModal({ isOpen, onOpenChange }: ProfileModalProps) {
   const { data: session, isPending } = authClient.useSession();
   const [isSignIn, setIsSignIn] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [showPseudoEdit, setShowPseudoEdit] = React.useState(false);
+
+  type ExtendedUser = { pseudo?: string | null; pseudoUpdatedAt?: string | null };
+  const extUser = session?.user as ExtendedUser | undefined;
+  const pseudoUpdatedAt = extUser?.pseudoUpdatedAt ? new Date(extUser.pseudoUpdatedAt) : null;
+  const cooldownRemaining = pseudoUpdatedAt
+    ? Math.max(0, 24 * 3600 * 1000 - (Date.now() - pseudoUpdatedAt.getTime()))
+    : 0;
+  const canEditPseudo = cooldownRemaining === 0;
   const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
 
   const [email, setEmail] = React.useState("");
@@ -44,34 +64,40 @@ export function ProfileModal({ isOpen, onOpenChange }: ProfileModalProps) {
 
     try {
       if (isSignIn) {
-        await authClient.signIn.email({
-          email,
-          password,
-          callbackURL: "/",
-        }, {
-          onSuccess: () => {
-            toast.success("Heureux de vous revoir !");
-            onOpenChange(false);
+        await authClient.signIn.email(
+          {
+            email,
+            password,
+            callbackURL: "/",
           },
-          onError: (ctx) => {
-            toast.error(ctx.error.message || "Erreur lors de la connexion");
-          }
-        });
+          {
+            onSuccess: () => {
+              toast.success("Heureux de vous revoir !");
+              onOpenChange(false);
+            },
+            onError: (ctx) => {
+              toast.error(ctx.error.message || "Erreur lors de la connexion");
+            },
+          },
+        );
       } else {
-        await authClient.signUp.email({
-          email,
-          password,
-          name,
-          callbackURL: "/",
-        }, {
-          onSuccess: () => {
-            toast.success("Bienvenue dans l'aventure !");
-            onOpenChange(false);
+        await authClient.signUp.email(
+          {
+            email,
+            password,
+            name,
+            callbackURL: "/",
           },
-          onError: (ctx) => {
-            toast.error(ctx.error.message || "Erreur lors de la création");
-          }
-        });
+          {
+            onSuccess: () => {
+              toast.success("Bienvenue dans l'aventure !");
+              onOpenChange(false);
+            },
+            onError: (ctx) => {
+              toast.error(ctx.error.message || "Erreur lors de la création");
+            },
+          },
+        );
       }
     } catch {
       toast.error("Une erreur est survenue");
@@ -99,8 +125,8 @@ export function ProfileModal({ isOpen, onOpenChange }: ProfileModalProps) {
         onSuccess: () => {
           toast.success("À bientôt !");
           onOpenChange(false);
-        }
-      }
+        },
+      },
     });
   };
 
@@ -127,7 +153,9 @@ export function ProfileModal({ isOpen, onOpenChange }: ProfileModalProps) {
               {session ? "Explorateur" : isSignIn ? "Connexion" : "Inscription"}
             </h2>
             <p className="text-slate-500 font-medium">
-              {session ? "Vos statistiques d'aventure" : "Rejoignez la communauté Pocket Maps"}
+              {session
+                ? "Vos statistiques d'aventure"
+                : "Rejoignez la communauté Pocket Maps"}
             </p>
           </div>
 
@@ -145,24 +173,95 @@ export function ProfileModal({ isOpen, onOpenChange }: ProfileModalProps) {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                  <span className="text-xl font-black text-slate-900 leading-tight">{session.user.name}</span>
-                  <span className="text-sm font-medium text-slate-500">{session.user.email}</span>
+                  <span className="text-xl font-black text-slate-900 leading-tight">
+                    {session.user.name}
+                  </span>
+                  <span className="text-sm font-medium text-slate-500">
+                    {session.user.email}
+                  </span>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-5 bg-teal-500/10 border border-teal-500/20 rounded-3xl">
-                  <span className="block text-[10px] font-black uppercase tracking-widest text-teal-600 mb-1">Visites</span>
+                  <span className="block text-[10px] font-black uppercase tracking-widest text-teal-600 mb-1">
+                    Visites
+                  </span>
                   <span className="text-2xl font-black text-teal-700">
-                    {stats ? stats.visitCount : <Loader2 className="animate-spin inline" size={20} />}
+                    {stats ? (
+                      stats.visitCount
+                    ) : (
+                      <Loader2 className="animate-spin inline" size={20} />
+                    )}
                   </span>
                 </div>
                 <div className="p-5 bg-blue-500/10 border border-blue-500/20 rounded-3xl">
-                  <span className="block text-[10px] font-black uppercase tracking-widest text-blue-600 mb-1">Top Score</span>
+                  <span className="block text-[10px] font-black uppercase tracking-widest text-blue-600 mb-1">
+                    Top Score
+                  </span>
                   <span className="text-2xl font-black text-blue-700">
-                    {stats ? (stats.topScore ? stats.topScore.toLocaleString() : "—") : <Loader2 className="animate-spin inline" size={20} />}
+                    {stats ? (
+                      stats.topScore ? (
+                        stats.topScore.toLocaleString()
+                      ) : (
+                        "—"
+                      )
+                    ) : (
+                      <Loader2 className="animate-spin inline" size={20} />
+                    )}
                   </span>
                 </div>
+              </div>
+
+              <div className="p-4 bg-white/20 rounded-[1.75rem] border border-white/30">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <AtSign size={16} className="text-orange-500" />
+                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+                      Pseudo
+                    </span>
+                  </div>
+                  {!showPseudoEdit && (
+                    canEditPseudo ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowPseudoEdit(true)}
+                        className="text-[11px] font-black uppercase tracking-widest text-orange-500 hover:text-orange-600 transition-colors"
+                      >
+                        {extUser?.pseudo ? "Modifier" : "Choisir"}
+                      </button>
+                    ) : (
+                      <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+                        Dans {Math.ceil(cooldownRemaining / 3600000)}h
+                      </span>
+                    )
+                  )}
+                </div>
+                {showPseudoEdit ? (
+                  <div>
+                    <PseudoForm
+                      onSuccess={() => setShowPseudoEdit(false)}
+                      submitLabel="Enregistrer"
+                      variant="light"
+                      autoFocus={false}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPseudoEdit(false)}
+                      className="mt-3 w-full text-center text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors"
+                    >
+                      Annuler
+                    </button>
+                  </div>
+                ) : extUser?.pseudo ? (
+                  <p className="text-lg font-black text-slate-800">
+                    {extUser.pseudo}
+                  </p>
+                ) : (
+                  <p className="text-sm font-medium text-slate-400">
+                    Aucun pseudo défini
+                  </p>
+                )}
               </div>
 
               <Button
@@ -182,12 +281,26 @@ export function ProfileModal({ isOpen, onOpenChange }: ProfileModalProps) {
                 disabled={isGoogleLoading}
                 className="w-full h-14 bg-white hover:bg-slate-50 text-slate-900 rounded-2xl font-black text-sm uppercase tracking-widest gap-3 border border-slate-200 shadow-xs transition-all"
               >
-                {isGoogleLoading ? <Loader2 className="animate-spin" size={18} /> : (
+                {isGoogleLoading ? (
+                  <Loader2 className="animate-spin" size={18} />
+                ) : (
                   <svg width="20" height="20" viewBox="0 0 24 24">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                    <path d="M12 23c3.11 0 5.72-1.03 7.63-2.79l-3.57-2.77c-.99.66-2.26 1.06-4.06 1.06-3.13 0-5.78-2.12-6.73-4.97H1.54v2.87C3.43 20.31 7.42 23 12 23z" fill="#34A853"/>
-                    <path d="M5.27 13.53c-.24-.72-.38-1.49-.38-2.28s.14-1.56.38-2.28V6.1H1.54C.56 8.06 0 10.24 0 12.5s.56 4.44 1.54 6.4l3.73-2.87z" fill="#FBBC05"/>
-                    <path d="M12 4.79c1.69 0 3.21.58 4.41 1.72l3.31-3.31C17.72 1.41 15.11 0 12 0 7.42 0 3.43 2.69 1.54 6.1l3.73 2.87c.95-2.85 3.6-4.97 6.73-4.97z" fill="#EA4335"/>
+                    <path
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                      fill="#4285F4"
+                    />
+                    <path
+                      d="M12 23c3.11 0 5.72-1.03 7.63-2.79l-3.57-2.77c-.99.66-2.26 1.06-4.06 1.06-3.13 0-5.78-2.12-6.73-4.97H1.54v2.87C3.43 20.31 7.42 23 12 23z"
+                      fill="#34A853"
+                    />
+                    <path
+                      d="M5.27 13.53c-.24-.72-.38-1.49-.38-2.28s.14-1.56.38-2.28V6.1H1.54C.56 8.06 0 10.24 0 12.5s.56 4.44 1.54 6.4l3.73-2.87z"
+                      fill="#FBBC05"
+                    />
+                    <path
+                      d="M12 4.79c1.69 0 3.21.58 4.41 1.72l3.31-3.31C17.72 1.41 15.11 0 12 0 7.42 0 3.43 2.69 1.54 6.1l3.73 2.87c.95-2.85 3.6-4.97 6.73-4.97z"
+                      fill="#EA4335"
+                    />
                   </svg>
                 )}
                 Continuer avec Google
@@ -198,16 +311,23 @@ export function ProfileModal({ isOpen, onOpenChange }: ProfileModalProps) {
                   <span className="w-full border-t border-slate-200"></span>
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-transparent px-2 text-slate-400 font-black tracking-widest">ou avec email</span>
+                  <span className="bg-transparent px-2 text-slate-400 font-black tracking-widest">
+                    ou avec email
+                  </span>
                 </div>
               </div>
 
               <form onSubmit={handleAuth} className="flex flex-col gap-4">
                 {!isSignIn && (
                   <div className="space-y-1.5">
-                    <Label className="ml-1 text-[11px] font-black uppercase tracking-widest text-slate-400">Nom</Label>
+                    <Label className="ml-1 text-[11px] font-black uppercase tracking-widest text-slate-400">
+                      Nom
+                    </Label>
                     <div className="relative">
-                      <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                      <UserIcon
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                        size={18}
+                      />
                       <Input
                         className="h-14 pl-12 rounded-2xl bg-white/50 border-white/60 focus:bg-white transition-all shadow-xs"
                         placeholder="Votre nom"
@@ -220,9 +340,14 @@ export function ProfileModal({ isOpen, onOpenChange }: ProfileModalProps) {
                 )}
 
                 <div className="space-y-1.5">
-                  <Label className="ml-1 text-[11px] font-black uppercase tracking-widest text-slate-400">Email</Label>
+                  <Label className="ml-1 text-[11px] font-black uppercase tracking-widest text-slate-400">
+                    Email
+                  </Label>
                   <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                    <Mail
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                      size={18}
+                    />
                     <Input
                       type="email"
                       className="h-14 pl-12 rounded-2xl bg-white/50 border-white/60 focus:bg-white transition-all shadow-xs"
@@ -235,9 +360,14 @@ export function ProfileModal({ isOpen, onOpenChange }: ProfileModalProps) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="ml-1 text-[11px] font-black uppercase tracking-widest text-slate-400">Mot de passe</Label>
+                  <Label className="ml-1 text-[11px] font-black uppercase tracking-widest text-slate-400">
+                    Mot de passe
+                  </Label>
                   <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                    <Lock
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                      size={18}
+                    />
                     <Input
                       type="password"
                       className="h-14 pl-12 rounded-2xl bg-white/50 border-white/60 focus:bg-white transition-all shadow-xs"
@@ -254,7 +384,13 @@ export function ProfileModal({ isOpen, onOpenChange }: ProfileModalProps) {
                   disabled={isLoading}
                   className="w-full h-14 mt-4 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest gap-2 shadow-xl shadow-orange-500/25 transition-all"
                 >
-                  {isLoading ? <Loader2 className="animate-spin" size={18} /> : (isSignIn ? "Se connecter" : "S'inscrire")}
+                  {isLoading ? (
+                    <Loader2 className="animate-spin" size={18} />
+                  ) : isSignIn ? (
+                    "Se connecter"
+                  ) : (
+                    "S'inscrire"
+                  )}
                   {!isLoading && <ChevronRight size={18} />}
                 </Button>
 
@@ -263,7 +399,9 @@ export function ProfileModal({ isOpen, onOpenChange }: ProfileModalProps) {
                   onClick={() => setIsSignIn(!isSignIn)}
                   className="text-center text-xs font-black uppercase tracking-widest text-slate-400 hover:text-orange-500 transition-colors py-2"
                 >
-                  {isSignIn ? "Pas encore de compte ? S'inscrire" : "Déjà un compte ? Se connecter"}
+                  {isSignIn
+                    ? "Pas encore de compte ? S'inscrire"
+                    : "Déjà un compte ? Se connecter"}
                 </button>
               </form>
             </div>
