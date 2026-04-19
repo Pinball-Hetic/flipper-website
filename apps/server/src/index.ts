@@ -8,6 +8,7 @@ import { PendingScoreController } from "./interface/PendingScoreController";
 import { ClaimController } from "./interface/ClaimController";
 import { CheckpointController } from "./interface/CheckpointController";
 import { UserController } from "./interface/UserController";
+import { PseudoController } from "./interface/PseudoController";
 import { MachineController } from "./interface/MachineController";
 import { startCron } from "./interface/CronJob";
 
@@ -54,6 +55,8 @@ app.get("/api/health", (_req, res) => {
 
 app.get("/api/checkpoints/:id/scores", CheckpointController.getScores);
 app.get("/api/users/:id/stats", UserController.getStats);
+app.post("/api/users/pseudo", PseudoController.set);
+app.get("/api/users/pseudo/check", PseudoController.check);
 app.get("/api/machines", MachineController.getAll);
 
 app.post("/api/scores", ScoreController.handle);
