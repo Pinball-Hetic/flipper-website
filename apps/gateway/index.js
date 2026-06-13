@@ -34,6 +34,12 @@ app.use('/api', (req, res, next) => {
   })(req, res, next);
 });
 
+// 1bis. Contrat /v1 (bornes) vers le Serveur Express
+app.use('/v1', createProxyMiddleware({
+  target: SERVER_TARGET,
+  changeOrigin: true,
+}));
+
 // 2. TOUT le reste (UI + Auth) vers le Client Next.js
 app.use('/', createProxyMiddleware({
   target: CLIENT_TARGET,
