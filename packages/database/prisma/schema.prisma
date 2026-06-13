@@ -186,6 +186,7 @@ enum PendingScoreStatus {
 model BorneScore {
   id            String   @id @default(cuid())
   code          String   @unique
+  gameId        String?  @unique
   cabinetId     String
   mapId         String
   score         Int
