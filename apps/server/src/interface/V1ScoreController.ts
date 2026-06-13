@@ -14,9 +14,9 @@ export class V1ScoreController {
     const useCase = new RegisterBorneScore(new PrismaBorneScoreRepository());
 
     try {
-      const borne = await useCase.execute(req.body);
+      const { borne, created } = await useCase.execute(req.body);
       const baseUrl = process.env.CLAIM_BASE_URL ?? "http://localhost:8888";
-      res.status(201).json({
+      res.status(created ? 201 : 200).json({
         scoreId: borne.id,
         code: borne.code,
         claimUrl: `${baseUrl}/?code=${borne.code}`,
