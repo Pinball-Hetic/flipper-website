@@ -12,6 +12,7 @@ export class CodeGenerationError extends Error {
 }
 
 const RegisterBorneScoreSchema = z.object({
+  gameId: z.string().uuid().optional(),
   cabinetId: z.string().min(1),
   mapId: z.string().min(1),
   score: z.number().int().min(1).max(99_999_999),
@@ -24,6 +25,11 @@ const RegisterBorneScoreSchema = z.object({
 
 export type RegisterBorneScoreInput = z.input<typeof RegisterBorneScoreSchema>;
 
+export interface RegisterBorneScoreResult {
+  borne: BorneScore;
+  created: boolean;
+}
+
 const MAX_CODE_ATTEMPTS = 10;
 const CLAIM_WINDOW_MS = 24 * 60 * 60 * 1000;
 
@@ -31,10 +37,14 @@ function generateCode(): string {
   return String(randomInt(100_000, 1_000_000));
 }
 
+function isUniqueConstraintError(err: unknown): boolean {
+  return typeof err === "object" && err !== null && (err as { code?: string }).code === "P2002";
+}
+
 export class RegisterBorneScore {
   constructor(private borneScores: IBorneScoreRepository) {}
 
-  async execute(input: RegisterBorneScoreInput): Promise<BorneScore> {
+  async execute(input: RegisterBorneScoreInput): Promise<RegisterBorneScoreResult> {
     const result = RegisterBorneScoreSchema.safeParse(input);
     if (!result.success) {
       throw new ValidationError(result.error.errors[0]?.message ?? "Invalid input");
@@ -42,23 +52,38 @@ export class RegisterBorneScore {
 
     const data = result.data;
 
+    if (data.gameId) {
+      const existing = await this.borneScores.findByGameId(data.gameId);
+      if (existing) return { borne: existing, created: false };
+    }
+
     const code = await this.allocateCode();
 
     const playedAt = new Date(data.playedAt);
     const expiresAt = new Date(playedAt.getTime() + CLAIM_WINDOW_MS);
 
-    return this.borneScores.save({
-      code,
-      cabinetId: data.cabinetId,
-      mapId: data.mapId,
-      score: data.score,
-      maxCombo: data.maxCombo,
-      maxMultiplier: data.maxMultiplier,
-      counters: data.counters,
-      durationS: data.durationS,
-      playedAt,
-      expiresAt,
-    });
+    try {
+      const borne = await this.borneScores.save({
+        code,
+        gameId: data.gameId,
+        cabinetId: data.cabinetId,
+        mapId: data.mapId,
+        score: data.score,
+        maxCombo: data.maxCombo,
+        maxMultiplier: data.maxMultiplier,
+        counters: data.counters,
+        durationS: data.durationS,
+        playedAt,
+        expiresAt,
+      });
+      return { borne, created: true };
+    } catch (err) {
+      if (data.gameId && isUniqueConstraintError(err)) {
+        const existing = await this.borneScores.findByGameId(data.gameId);
+        if (existing) return { borne: existing, created: false };
+      }
+      throw err;
+    }
   }
 
   private async allocateCode(): Promise<string> {

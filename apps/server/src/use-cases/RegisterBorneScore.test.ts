@@ -5,6 +5,7 @@ import type { IBorneScoreRepository } from "../domain/IBorneScoreRepository";
 import type { BorneScore } from "../domain/BorneScore";
 
 const playedAt = new Date("2026-06-14T10:00:00.000Z");
+const GAME_ID = "550e8400-e29b-41d4-a716-446655440000";
 
 const makeBorne = (overrides: Partial<BorneScore> = {}): BorneScore => ({
   id: "borne-1",
@@ -22,6 +23,7 @@ const makeBorne = (overrides: Partial<BorneScore> = {}): BorneScore => ({
 const makeRepo = (existsByCode = false): IBorneScoreRepository => ({
   save: vi.fn().mockResolvedValue(makeBorne()),
   findByCode: vi.fn().mockResolvedValue(null),
+  findByGameId: vi.fn().mockResolvedValue(null),
   existsByCode: vi.fn().mockResolvedValue(existsByCode),
   claimByCode: vi.fn().mockResolvedValue(true),
   topByMap: vi.fn().mockResolvedValue([]),
@@ -35,11 +37,12 @@ const validInput = {
 };
 
 describe("RegisterBorneScore", () => {
-  it("retourne un BorneScore pour un payload valide", async () => {
+  it("crée un BorneScore pour un payload valide sans gameId", async () => {
     const useCase = new RegisterBorneScore(makeRepo());
     const result = await useCase.execute(validInput);
-    expect(result.id).toBe("borne-1");
-    expect(result.code).toMatch(/^\d{6}$/);
+    expect(result.created).toBe(true);
+    expect(result.borne.id).toBe("borne-1");
+    expect(result.borne.code).toMatch(/^\d{6}$/);
   });
 
   it("calcule expiresAt = playedAt + 24h", async () => {
@@ -99,5 +102,59 @@ describe("RegisterBorneScore", () => {
     await expect(useCase.execute({ ...validInput, cabinetId: "" })).rejects.toThrow(
       ValidationError,
     );
+  });
+
+  it("lève ValidationError si gameId n'est pas un UUID", async () => {
+    const useCase = new RegisterBorneScore(makeRepo());
+    await expect(useCase.execute({ ...validInput, gameId: "not-a-uuid" })).rejects.toThrow(
+      ValidationError,
+    );
+  });
+
+  describe("idempotence (gameId)", () => {
+    it("crée quand gameId est nouveau (inconnu)", async () => {
+      const repo = makeRepo();
+      const useCase = new RegisterBorneScore(repo);
+      const result = await useCase.execute({ ...validInput, gameId: GAME_ID });
+      expect(result.created).toBe(true);
+      expect(repo.findByGameId).toHaveBeenCalledWith(GAME_ID);
+      const arg = (repo.save as ReturnType<typeof vi.fn>).mock.calls[0][0];
+      expect(arg.gameId).toBe(GAME_ID);
+    });
+
+    it("renvoie l'existant sans doublon ni nouveau code si gameId déjà connu", async () => {
+      const repo = makeRepo();
+      const existing = makeBorne({ id: "borne-existing", code: "999999", gameId: GAME_ID });
+      repo.findByGameId = vi.fn().mockResolvedValue(existing);
+      const useCase = new RegisterBorneScore(repo);
+      const result = await useCase.execute({ ...validInput, gameId: GAME_ID });
+      expect(result.created).toBe(false);
+      expect(result.borne).toBe(existing);
+      expect(result.borne.code).toBe("999999");
+      expect(repo.save).not.toHaveBeenCalled();
+      expect(repo.existsByCode).not.toHaveBeenCalled();
+    });
+
+    it("gère la race condition : save échoue en P2002 → refetch renvoie l'existant", async () => {
+      const repo = makeRepo();
+      const existing = makeBorne({ id: "borne-existing", code: "999999", gameId: GAME_ID });
+      repo.findByGameId = vi
+        .fn()
+        .mockResolvedValueOnce(null)
+        .mockResolvedValue(existing);
+      repo.save = vi.fn().mockRejectedValue(Object.assign(new Error("Unique"), { code: "P2002" }));
+      const useCase = new RegisterBorneScore(repo);
+      const result = await useCase.execute({ ...validInput, gameId: GAME_ID });
+      expect(result.created).toBe(false);
+      expect(result.borne).toBe(existing);
+      expect(repo.findByGameId).toHaveBeenCalledTimes(2);
+    });
+
+    it("propage l'erreur si save échoue sans gameId", async () => {
+      const repo = makeRepo();
+      repo.save = vi.fn().mockRejectedValue(new Error("DB down"));
+      const useCase = new RegisterBorneScore(repo);
+      await expect(useCase.execute(validInput)).rejects.toThrow("DB down");
+    });
   });
 });
