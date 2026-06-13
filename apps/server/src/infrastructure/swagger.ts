@@ -127,6 +127,13 @@ const options: swaggerJsdoc.Options = {
           type: "object",
           required: ["cabinetId", "mapId", "score", "playedAt"],
           properties: {
+            gameId: {
+              type: "string",
+              format: "uuid",
+              description:
+                "Optionnel — clé d'idempotence. Réenvoyer le même gameId ne crée pas de doublon et renvoie le score existant (200).",
+              example: "550e8400-e29b-41d4-a716-446655440000",
+            },
             cabinetId: { type: "string", example: "borne-paris-01" },
             mapId: { type: "string", example: "strangerthings" },
             score: { type: "integer", minimum: 1, maximum: 99999999, example: 158400 },
@@ -482,6 +489,10 @@ const options: swaggerJsdoc.Options = {
             content: { "application/json": { schema: { $ref: "#/components/schemas/V1ScoreInput" } } },
           },
           responses: {
+            "200": {
+              description: "Replay idempotent — gameId déjà connu, score existant renvoyé (aucun doublon)",
+              content: { "application/json": { schema: { $ref: "#/components/schemas/V1ScoreCreated" } } },
+            },
             "201": {
               description: "Score créé",
               content: { "application/json": { schema: { $ref: "#/components/schemas/V1ScoreCreated" } } },
