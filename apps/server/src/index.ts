@@ -10,6 +10,9 @@ import { CheckpointController } from "./interface/CheckpointController";
 import { UserController } from "./interface/UserController";
 import { PseudoController } from "./interface/PseudoController";
 import { MachineController } from "./interface/MachineController";
+import { V1ScoreController } from "./interface/V1ScoreController";
+import { V1ClaimController } from "./interface/V1ClaimController";
+import { V1LeaderboardController } from "./interface/V1LeaderboardController";
 import { startCron } from "./interface/CronJob";
 
 config({ path: "../../.env" });
@@ -63,6 +66,12 @@ app.post("/api/scores", ScoreController.handle);
 app.post("/api/pending-scores", PendingScoreController.handle);
 app.post("/api/pending-scores/claim", ClaimController.handle);
 app.get("/api/pending-scores/:code", PendingScoreController.getByCode);
+
+// v1 — surface parallèle découplée pour les bornes (auth Bearer CABINET_KEY)
+app.post("/v1/scores", V1ScoreController.create);
+app.get("/v1/claim/:code", V1ClaimController.get);
+app.post("/v1/claim/:code", V1ClaimController.claim);
+app.get("/v1/leaderboard", V1LeaderboardController.get);
 
 startCron();
 
