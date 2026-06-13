@@ -14,3 +14,13 @@ export function validatePseudo(pseudo: string): void {
     );
   }
 }
+
+const PROFANITY = [
+  "fuck", "shit", "bitch", "cunt", "asshole", "nigger", "nigga", "faggot",
+  "putain", "merde", "salope", "connard", "encule", "pute", "batard",
+];
+
+export function isProfane(pseudo: string): boolean {
+  const normalized = pseudo.toLowerCase().replace(/[_0-9]/g, "");
+  return PROFANITY.some((word) => normalized.includes(word));
+}
