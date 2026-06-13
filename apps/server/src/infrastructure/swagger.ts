@@ -27,6 +27,12 @@ const options: swaggerJsdoc.Options = {
           scheme: "bearer",
           description: "Token de session Better Auth",
         },
+        CabinetBearer: {
+          type: "http",
+          scheme: "bearer",
+          description:
+            "Clé partagée des bornes pour le contrat /v1 — Authorization: Bearer <CABINET_KEY>. Fallback dev sur BORNE_API_KEY.",
+        },
       },
       schemas: {
         Machine: {
@@ -115,6 +121,68 @@ const options: swaggerJsdoc.Options = {
             timestamp: { type: "string", format: "date-time" },
             status: { type: "string", enum: ["UNCLAIMED"] },
             expiresAt: { type: "string", format: "date-time" },
+          },
+        },
+        V1ScoreInput: {
+          type: "object",
+          required: ["cabinetId", "mapId", "score", "playedAt"],
+          properties: {
+            cabinetId: { type: "string", example: "borne-paris-01" },
+            mapId: { type: "string", example: "strangerthings" },
+            score: { type: "integer", minimum: 1, maximum: 99999999, example: 158400 },
+            maxCombo: { type: "integer", minimum: 0, example: 12 },
+            maxMultiplier: { type: "integer", minimum: 0, example: 5 },
+            counters: {
+              type: "object",
+              additionalProperties: { type: "integer" },
+              example: { ramps: 3, bumpers: 40 },
+            },
+            durationS: { type: "integer", minimum: 0, example: 120 },
+            playedAt: { type: "string", format: "date-time", example: "2026-06-14T14:32:00.000Z" },
+          },
+        },
+        V1ScoreCreated: {
+          type: "object",
+          properties: {
+            scoreId: { type: "string", example: "clx9876fghij" },
+            code: { type: "string", example: "428193" },
+            claimUrl: { type: "string", example: "http://localhost:8888/?code=428193" },
+          },
+        },
+        V1ClaimPreview: {
+          type: "object",
+          properties: {
+            score: { type: "integer", example: 158400 },
+            mapId: { type: "string", example: "strangerthings" },
+            playedAt: { type: "string", format: "date-time" },
+            claimed: { type: "boolean", example: false },
+            pseudo: { type: "string", nullable: true, example: null },
+          },
+        },
+        V1ClaimResult: {
+          type: "object",
+          properties: {
+            ok: { type: "boolean", example: true },
+            pseudo: { type: "string", example: "LUCAS_42" },
+          },
+        },
+        V1LeaderboardEntry: {
+          type: "object",
+          properties: {
+            rank: { type: "integer", example: 1 },
+            pseudo: { type: "string", nullable: true, example: "LUCAS_42" },
+            score: { type: "integer", example: 158400 },
+            claimed: { type: "boolean", example: true },
+            playedAt: { type: "string", format: "date-time" },
+          },
+        },
+        V1Leaderboard: {
+          type: "object",
+          properties: {
+            entries: {
+              type: "array",
+              items: { $ref: "#/components/schemas/V1LeaderboardEntry" },
+            },
           },
         },
       },
@@ -398,6 +466,164 @@ const options: swaggerJsdoc.Options = {
             },
             "500": {
               description: "Erreur serveur",
+              content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } },
+            },
+          },
+        },
+      },
+      "/v1/scores": {
+        post: {
+          summary: "Enregistrer un score de borne (contrat v1)",
+          description:
+            "Appelé par la borne en fin de partie. Génère un code de claim à 6 chiffres et renvoie l'URL de réclamation.",
+          security: [{ CabinetBearer: [] }],
+          requestBody: {
+            required: true,
+            content: { "application/json": { schema: { $ref: "#/components/schemas/V1ScoreInput" } } },
+          },
+          responses: {
+            "201": {
+              description: "Score créé",
+              content: { "application/json": { schema: { $ref: "#/components/schemas/V1ScoreCreated" } } },
+            },
+            "400": {
+              description: "Validation échouée",
+              content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } },
+            },
+            "401": {
+              description: "Bearer absent ou invalide",
+              content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } },
+            },
+            "500": {
+              description: "Erreur serveur",
+              content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } },
+            },
+          },
+        },
+      },
+      "/v1/claim/{code}": {
+        get: {
+          summary: "Prévisualiser un score à réclamer (v1)",
+          description: "Route publique — affiche le score avant réclamation.",
+          parameters: [
+            {
+              name: "code",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+              description: "Code de réclamation à 6 chiffres",
+            },
+          ],
+          responses: {
+            "200": {
+              description: "Score disponible",
+              content: { "application/json": { schema: { $ref: "#/components/schemas/V1ClaimPreview" } } },
+            },
+            "404": {
+              description: "Code inconnu ou expiré",
+              content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } },
+            },
+            "409": {
+              description: "Score déjà réclamé",
+              content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } },
+            },
+          },
+        },
+        post: {
+          summary: "Réclamer un score de façon anonyme (v1)",
+          description:
+            "Route publique — attache un pseudo au score. Aucun compte requis. Le pseudo est normalisé en majuscules.",
+          parameters: [
+            {
+              name: "code",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+              description: "Code de réclamation à 6 chiffres",
+            },
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["pseudo"],
+                  properties: {
+                    pseudo: {
+                      type: "string",
+                      minLength: 3,
+                      maxLength: 20,
+                      pattern: "^[a-zA-Z0-9_]+$",
+                      example: "Lucas_42",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Score réclamé",
+              content: { "application/json": { schema: { $ref: "#/components/schemas/V1ClaimResult" } } },
+            },
+            "400": {
+              description: "Pseudo invalide (longueur, charset ou grossièreté)",
+              content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } },
+            },
+            "404": {
+              description: "Code inconnu",
+              content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } },
+            },
+            "409": {
+              description: "Score déjà réclamé",
+              content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } },
+            },
+            "410": {
+              description: "Code expiré",
+              content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } },
+            },
+          },
+        },
+      },
+      "/v1/leaderboard": {
+        get: {
+          summary: "Classement mondial par jeu (v1)",
+          description:
+            "Route publique. Retourne le top N des scores d'un jeu, triés décroissant. Supporte ETag / If-None-Match (304).",
+          parameters: [
+            {
+              name: "mapId",
+              in: "query",
+              required: true,
+              schema: { type: "string" },
+              description: "Slug du jeu",
+            },
+            {
+              name: "scope",
+              in: "query",
+              required: false,
+              schema: { type: "string", enum: ["world"], default: "world" },
+              description: "Seul 'world' est supporté",
+            },
+            {
+              name: "limit",
+              in: "query",
+              required: false,
+              schema: { type: "integer", minimum: 1, maximum: 100, default: 10 },
+            },
+          ],
+          responses: {
+            "200": {
+              description: "Classement",
+              headers: {
+                ETag: { schema: { type: "string" }, description: "Hash du payload" },
+              },
+              content: { "application/json": { schema: { $ref: "#/components/schemas/V1Leaderboard" } } },
+            },
+            "304": { description: "Non modifié (If-None-Match correspond à l'ETag)" },
+            "400": {
+              description: "Validation échouée",
               content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } },
             },
           },
