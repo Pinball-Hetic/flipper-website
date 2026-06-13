@@ -5,6 +5,7 @@ import { prisma } from "./prisma";
 export class PrismaBorneScoreRepository implements IBorneScoreRepository {
   async save(data: {
     code: string;
+    gameId?: string;
     cabinetId: string;
     mapId: string;
     score: number;
@@ -21,6 +22,11 @@ export class PrismaBorneScoreRepository implements IBorneScoreRepository {
 
   async findByCode(code: string): Promise<BorneScore | null> {
     const row = await prisma.borneScore.findUnique({ where: { code } });
+    return row ? this.toDomain(row) : null;
+  }
+
+  async findByGameId(gameId: string): Promise<BorneScore | null> {
+    const row = await prisma.borneScore.findUnique({ where: { gameId } });
     return row ? this.toDomain(row) : null;
   }
 
@@ -52,6 +58,7 @@ export class PrismaBorneScoreRepository implements IBorneScoreRepository {
   private toDomain(row: {
     id: string;
     code: string;
+    gameId: string | null;
     cabinetId: string;
     mapId: string;
     score: number;
@@ -69,6 +76,7 @@ export class PrismaBorneScoreRepository implements IBorneScoreRepository {
     return {
       id: row.id,
       code: row.code,
+      gameId: row.gameId ?? undefined,
       cabinetId: row.cabinetId,
       mapId: row.mapId,
       score: row.score,
