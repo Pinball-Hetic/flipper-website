@@ -17,6 +17,7 @@ const makeScoreRepo = (score?: Score, isDuplicate = false): IScoreRepository => 
   save: vi.fn().mockResolvedValue(score ?? makeScore()),
   saveFromPending: vi.fn(),
   existsRecentScore: vi.fn().mockResolvedValue(isDuplicate),
+  existsByPseudo: vi.fn().mockResolvedValue(false),
   findTopByUser: vi.fn().mockResolvedValue(null),
 });
 

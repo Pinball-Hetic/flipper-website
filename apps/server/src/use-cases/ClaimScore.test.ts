@@ -43,6 +43,7 @@ const makeScoreRepo = (): IScoreRepository => ({
   save: vi.fn(),
   saveFromPending: vi.fn().mockResolvedValue(makeScore()),
   existsRecentScore: vi.fn().mockResolvedValue(false),
+  existsByPseudo: vi.fn().mockResolvedValue(false),
   findTopByUser: vi.fn().mockResolvedValue(null),
 });
 
