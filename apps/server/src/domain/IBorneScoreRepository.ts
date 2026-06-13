@@ -3,6 +3,7 @@ import type { BorneScore } from "./BorneScore";
 export interface IBorneScoreRepository {
   save(data: {
     code: string;
+    gameId?: string;
     cabinetId: string;
     mapId: string;
     score: number;
@@ -15,6 +16,8 @@ export interface IBorneScoreRepository {
   }): Promise<BorneScore>;
 
   findByCode(code: string): Promise<BorneScore | null>;
+
+  findByGameId(gameId: string): Promise<BorneScore | null>;
 
   existsByCode(code: string): Promise<boolean>;
 

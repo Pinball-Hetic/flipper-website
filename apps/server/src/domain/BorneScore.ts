@@ -1,6 +1,7 @@
 export interface BorneScore {
   id: string;
   code: string;
+  gameId?: string;
   cabinetId: string;
   mapId: string;
   score: number;

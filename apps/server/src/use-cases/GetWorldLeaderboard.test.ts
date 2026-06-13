@@ -20,6 +20,7 @@ const makeBorne = (overrides: Partial<BorneScore> = {}): BorneScore => ({
 const makeRepo = (rows: BorneScore[]): IBorneScoreRepository => ({
   save: vi.fn(),
   findByCode: vi.fn().mockResolvedValue(null),
+  findByGameId: vi.fn().mockResolvedValue(null),
   existsByCode: vi.fn().mockResolvedValue(false),
   claimByCode: vi.fn().mockResolvedValue(true),
   topByMap: vi.fn().mockResolvedValue(rows),

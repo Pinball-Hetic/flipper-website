@@ -28,6 +28,7 @@ const makeRepo = (
 ): IBorneScoreRepository => ({
   save: vi.fn(),
   findByCode: vi.fn().mockResolvedValue(borne),
+  findByGameId: vi.fn().mockResolvedValue(null),
   existsByCode: vi.fn().mockResolvedValue(false),
   claimByCode: vi.fn().mockResolvedValue(claimable),
   topByMap: vi.fn().mockResolvedValue([]),
