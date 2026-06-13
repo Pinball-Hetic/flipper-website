@@ -183,6 +183,28 @@ enum PendingScoreStatus {
   EXPIRED
 }
 
+model BorneScore {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  cabinetId     String
+  mapId         String
+  score         Int
+  maxCombo      Int?
+  maxMultiplier Int?
+  counters      Json?
+  durationS     Int?
+  playedAt      DateTime
+  pseudo        String?
+  claimed       Boolean  @default(false)
+  claimedAt     DateTime?
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
+
+  @@index([mapId, score(sort: Desc)])
+  @@index([code])
+  @@map("borne_score")
+}
+
 model Visit {
   id           String     @id @default(cuid())
   userId       String
