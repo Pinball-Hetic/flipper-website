@@ -17,10 +17,12 @@ export class PrismaUserRepository implements IUserRepository {
     return user;
   }
 
-  async findById(userId: string): Promise<{ id: string; pseudoUpdatedAt: Date | null } | null> {
+  async findById(
+    userId: string,
+  ): Promise<{ id: string; pseudo: string | null; pseudoUpdatedAt: Date | null } | null> {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, pseudoUpdatedAt: true },
+      select: { id: true, pseudo: true, pseudoUpdatedAt: true },
     });
     return user;
   }
