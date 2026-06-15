@@ -71,6 +71,9 @@ app.get("/api/admin/bornes/:id", BorneAdminController.get);
 app.patch("/api/admin/bornes/:id", BorneAdminController.update);
 app.post("/api/admin/bornes/:id/token", BorneTokenController.issue);
 app.delete("/api/admin/bornes/:id/token", BorneTokenController.revoke);
+app.patch("/api/admin/bornes/:id/owner", BorneAdminController.assignOwner);
+app.get("/api/admin/users", BorneAdminController.listUsers);
+app.post("/api/admin/users/:id/role", BorneAdminController.setUserRole);
 
 app.post("/api/scores", ScoreController.handle);
 app.post("/api/pending-scores", PendingScoreController.handle);

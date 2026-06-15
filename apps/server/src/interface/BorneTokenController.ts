@@ -1,14 +1,17 @@
 import type { Request, Response } from "express";
-import { requireAdmin } from "./requireAdmin";
+import { requireBorneAccess } from "./requireBorneAccess";
 import { PrismaCheckpointRepository } from "../infrastructure/PrismaCheckpointRepository";
 import { GenerateBorneToken } from "../use-cases/GenerateBorneToken";
 import { RevokeBorneToken } from "../use-cases/RevokeBorneToken";
 import { CheckpointNotFoundError } from "../use-cases/UpdateBorne";
 
-function denied(res: Response, status: 401 | 403): void {
-  const message =
-    status === 401 ? "Authentification requise" : "Accès réservé aux admins";
-  res.status(status).json({ error: message });
+function denied(res: Response, status: 401 | 403 | 404): void {
+  const messages: Record<number, string> = {
+    401: "Authentification requise",
+    403: "Accès refusé",
+    404: "Borne introuvable",
+  };
+  res.status(status).json({ error: messages[status] });
 }
 
 function handleError(res: Response, err: unknown): void {
@@ -22,8 +25,8 @@ function handleError(res: Response, err: unknown): void {
 
 export class BorneTokenController {
   static async issue(req: Request, res: Response): Promise<void> {
-    const auth = await requireAdmin(req);
-    if (!auth.ok) return denied(res, auth.status);
+    const access = await requireBorneAccess(req, String(req.params.id));
+    if (!access.ok) return denied(res, access.status);
 
     const useCase = new GenerateBorneToken(new PrismaCheckpointRepository());
     try {
@@ -35,8 +38,8 @@ export class BorneTokenController {
   }
 
   static async revoke(req: Request, res: Response): Promise<void> {
-    const auth = await requireAdmin(req);
-    if (!auth.ok) return denied(res, auth.status);
+    const access = await requireBorneAccess(req, String(req.params.id));
+    if (!access.ok) return denied(res, access.status);
 
     const useCase = new RevokeBorneToken(new PrismaCheckpointRepository());
     try {
