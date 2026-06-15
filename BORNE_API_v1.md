@@ -100,7 +100,7 @@ curl -X POST https://<base>/v1/scores \
 {
   "scoreId": "clx9876fghij",
   "code": "482913",
-  "claimUrl": "https://<base-claim>/?code=482913"
+  "claimUrl": "https://<base-claim>/claim/482913"
 }
 ```
 

@@ -19,7 +19,7 @@ export class V1ScoreController {
       res.status(created ? 201 : 200).json({
         scoreId: borne.id,
         code: borne.code,
-        claimUrl: `${baseUrl}/?code=${borne.code}`,
+        claimUrl: `${baseUrl}/claim/${borne.code}`,
       });
     } catch (err) {
       if (err instanceof ValidationError) {

@@ -153,7 +153,7 @@ const options: swaggerJsdoc.Options = {
           properties: {
             scoreId: { type: "string", example: "clx9876fghij" },
             code: { type: "string", example: "428193" },
-            claimUrl: { type: "string", example: "http://localhost:8888/?code=428193" },
+            claimUrl: { type: "string", example: "http://localhost:8888/claim/428193" },
           },
         },
         V1ClaimPreview: {
