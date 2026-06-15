@@ -14,12 +14,6 @@ app.use(cors({
   credentials: true,
 }));
 
-// DEBUG : Voir toutes les requêtes qui entrent dans la Gateway
-app.use((req, res, next) => {
-  console.log(`[Gateway] ${req.method} ${req.url} -> Host: ${req.headers.host}`);
-  next();
-});
-
 // 1. Redirection spécifique pour le Serveur API (SAUF /api/auth)
 // Proxy créé UNE seule fois au démarrage (sinon fuite mémoire : une instance par requête)
 const apiProxy = createProxyMiddleware({ target: SERVER_TARGET, changeOrigin: true });
