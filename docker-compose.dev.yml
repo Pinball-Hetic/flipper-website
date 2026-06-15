@@ -22,6 +22,9 @@ services:
       context: .
       dockerfile: apps/client/Dockerfile.dev
     container_name: pocket-maps-client-dev
+    # Régénère le client Prisma au démarrage : le volume anonyme /app/node_modules
+    # fige le client baké à l'image, périmé après tout changement de schéma.
+    command: sh -c "npm run db:generate -w @pocket-maps/database && npm run dev -w @pocket-maps/client"
     ports:
       - "8888:8888"
     volumes:
@@ -43,6 +46,8 @@ services:
       context: .
       dockerfile: apps/server/Dockerfile.dev
     container_name: pocket-maps-server-dev
+    # Régénère le client Prisma au démarrage (cf. note service client).
+    command: sh -c "npm run db:generate -w @pocket-maps/database && npm run dev -w @pocket-maps/server"
     ports:
       - "8882:8882"
     volumes:
