@@ -11,6 +11,7 @@ import { UserController } from "./interface/UserController";
 import { PseudoController } from "./interface/PseudoController";
 import { AdminController } from "./interface/AdminController";
 import { BorneAdminController } from "./interface/BorneAdminController";
+import { BorneTokenController } from "./interface/BorneTokenController";
 import { MachineController } from "./interface/MachineController";
 import { V1ScoreController } from "./interface/V1ScoreController";
 import { V1ClaimController } from "./interface/V1ClaimController";
@@ -68,6 +69,8 @@ app.post("/api/admin/bornes", BorneAdminController.create);
 app.get("/api/admin/bornes", BorneAdminController.list);
 app.get("/api/admin/bornes/:id", BorneAdminController.get);
 app.patch("/api/admin/bornes/:id", BorneAdminController.update);
+app.post("/api/admin/bornes/:id/token", BorneTokenController.issue);
+app.delete("/api/admin/bornes/:id/token", BorneTokenController.revoke);
 
 app.post("/api/scores", ScoreController.handle);
 app.post("/api/pending-scores", PendingScoreController.handle);
