@@ -41,6 +41,13 @@ export interface UpdateBorneBody {
   lng?: number;
 }
 
+export interface AdminUser {
+  id: string;
+  email: string;
+  pseudo: string | null;
+  role: string;
+}
+
 export interface MachineScores {
   id: string;
   name: string;
@@ -95,4 +102,25 @@ export async function revokeBorneToken(id: string): Promise<void> {
 
 export function getBorneScores(id: string): Promise<MachineScores[]> {
   return fetchJson<MachineScores[]>(`${SERVER_URL}/api/checkpoints/${id}/scores`);
+}
+
+export function assignBorneOwner(
+  id: string,
+  ownerUserId: string | null,
+): Promise<AdminBorne> {
+  return fetchJson<AdminBorne>(
+    `${SERVER_URL}/api/admin/bornes/${id}/owner`,
+    withCreds({ method: "PATCH", body: JSON.stringify({ ownerUserId }) }),
+  );
+}
+
+export function listUsers(): Promise<AdminUser[]> {
+  return fetchJson<AdminUser[]>(`${SERVER_URL}/api/admin/users`, withCreds());
+}
+
+export function setUserRole(userId: string, role: string): Promise<void> {
+  return fetchJson<void>(
+    `${SERVER_URL}/api/admin/users/${userId}/role`,
+    withCreds({ method: "POST", body: JSON.stringify({ role }) }),
+  );
 }

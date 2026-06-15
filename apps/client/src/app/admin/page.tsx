@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, Loader2, MapPin, Cpu, AlertTriangle } from "lucide-react";
+import { Plus, Loader2, MapPin, Cpu, AlertTriangle, Users } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 import { listBornes, type AdminBorne } from "@/lib/admin-api";
 
 type State =
@@ -13,6 +14,9 @@ type State =
 
 export default function AdminBornesList() {
   const router = useRouter();
+  const { data: session } = authClient.useSession();
+  const isAdmin =
+    (session?.user as { role?: string } | undefined)?.role === "admin";
   const [state, setState] = useState<State>({ kind: "loading" });
 
   useEffect(() => {
@@ -43,13 +47,24 @@ export default function AdminBornesList() {
             Gère le registre des bornes et leurs tokens.
           </p>
         </div>
-        <Link
-          href="/admin/bornes/new"
-          className="inline-flex h-11 items-center gap-2 rounded-xl bg-orange-500 px-4 text-sm font-semibold text-white transition-colors hover:bg-orange-400"
-        >
-          <Plus className="size-4" aria-hidden />
-          Créer une borne
-        </Link>
+        {isAdmin && (
+          <div className="flex items-center gap-2">
+            <Link
+              href="/admin/users"
+              className="inline-flex h-11 items-center gap-2 rounded-xl border border-white/15 px-4 text-sm font-semibold text-white/80 transition-colors hover:bg-white/5"
+            >
+              <Users className="size-4" aria-hidden />
+              Utilisateurs
+            </Link>
+            <Link
+              href="/admin/bornes/new"
+              className="inline-flex h-11 items-center gap-2 rounded-xl bg-orange-500 px-4 text-sm font-semibold text-white transition-colors hover:bg-orange-400"
+            >
+              <Plus className="size-4" aria-hidden />
+              Créer une borne
+            </Link>
+          </div>
+        )}
       </div>
 
       {state.kind === "loading" && (
@@ -72,13 +87,17 @@ export default function AdminBornesList() {
       {state.kind === "ready" && state.bornes.length === 0 && (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-white/10 bg-slate-900/50 px-5 py-16 text-center">
           <Cpu className="size-8 text-white/30" aria-hidden />
-          <p className="text-sm text-white/50">Aucune borne pour l&apos;instant.</p>
-          <Link
-            href="/admin/bornes/new"
-            className="mt-1 text-sm font-semibold text-orange-400 hover:text-orange-300"
-          >
-            Créer la première
-          </Link>
+          <p className="text-sm text-white/50">
+            {isAdmin ? "Aucune borne pour l'instant." : "Aucune borne assignée."}
+          </p>
+          {isAdmin && (
+            <Link
+              href="/admin/bornes/new"
+              className="mt-1 text-sm font-semibold text-orange-400 hover:text-orange-300"
+            >
+              Créer la première
+            </Link>
+          )}
         </div>
       )}
 

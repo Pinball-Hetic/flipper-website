@@ -5,9 +5,11 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Loader2, Save, AlertTriangle, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { authClient } from "@/lib/auth-client";
 import AdminMapContainer from "@/components/Map/AdminMapContainer";
 import AdminTokenPanel from "@/components/admin/AdminTokenPanel";
 import BorneScores from "@/components/admin/BorneScores";
+import OwnerAssign from "@/components/admin/OwnerAssign";
 import { getBorne, updateBorne, type AdminBorne } from "@/lib/admin-api";
 
 const fieldClass =
@@ -17,6 +19,9 @@ const labelClass = "text-xs font-medium text-white/60";
 export default function BorneDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const { data: session } = authClient.useSession();
+  const isAdmin =
+    (session?.user as { role?: string } | undefined)?.role === "admin";
 
   const [borne, setBorne] = useState<AdminBorne | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -179,6 +184,8 @@ export default function BorneDetailPage() {
           Enregistrer
         </button>
       </form>
+
+      {isAdmin && <OwnerAssign borneId={borne.id} currentOwnerId={borne.ownerUserId} />}
 
       <AdminTokenPanel borneId={borne.id} />
 
