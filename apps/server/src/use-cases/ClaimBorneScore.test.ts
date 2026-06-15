@@ -38,7 +38,9 @@ const makeRepo = (
 });
 
 const makeUserRepo = (
-  user: { id: string; pseudo: string | null; pseudoUpdatedAt: Date | null } | null = null,
+  user:
+    | { id: string; pseudo: string | null; pseudoUpdatedAt: Date | null; role: string }
+    | null = null,
 ): IUserRepository => ({
   setPseudo: vi.fn(),
   findByPseudo: vi.fn().mockResolvedValue(null),
@@ -120,6 +122,7 @@ describe("ClaimBorneScore — compte connecté", () => {
       id: "user-1",
       pseudo: "BallWizard",
       pseudoUpdatedAt: new Date(),
+      role: "user",
     });
     const useCase = new ClaimBorneScore(repo, userRepo);
     const result = await useCase.execute("123456", { userId: "user-1" });
@@ -137,6 +140,7 @@ describe("ClaimBorneScore — compte connecté", () => {
       id: "user-1",
       pseudo: null,
       pseudoUpdatedAt: null,
+      role: "user",
     });
     const useCase = new ClaimBorneScore(makeRepo(makeBorne()), userRepo);
     await expect(useCase.execute("123456", { userId: "user-1" })).rejects.toThrow(
@@ -157,6 +161,7 @@ describe("ClaimBorneScore — compte connecté", () => {
       id: "user-1",
       pseudo: "BallWizard",
       pseudoUpdatedAt: new Date(),
+      role: "user",
     });
     const useCase = new ClaimBorneScore(repo, userRepo);
     const result = await useCase.execute("123456", {
