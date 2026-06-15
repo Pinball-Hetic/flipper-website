@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Loader2, Mail, Lock, User as UserIcon, ChevronRight } from "lucide-react";
 
-export default function LoginPage() {
+function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") ?? "/";
@@ -34,12 +34,16 @@ export default function LoginPage() {
       if (isSignIn) {
         await authClient.signIn.email({ email, password, callbackURL: redirectTo }, {
           onSuccess: () => router.replace(redirectTo),
-          onError: (ctx) => toast.error(ctx.error.message || "Erreur lors de la connexion"),
+          onError: (ctx) => {
+            toast.error(ctx.error.message || "Erreur lors de la connexion");
+          },
         });
       } else {
         await authClient.signUp.email({ email, password, name, callbackURL: redirectTo }, {
           onSuccess: () => router.replace(redirectTo),
-          onError: (ctx) => toast.error(ctx.error.message || "Erreur lors de l'inscription"),
+          onError: (ctx) => {
+            toast.error(ctx.error.message || "Erreur lors de l'inscription");
+          },
         });
       }
     } catch {
@@ -168,7 +172,7 @@ export default function LoginPage() {
                   className="h-11 border-white/[0.08] bg-white/[0.04] pl-10 text-sm text-white placeholder:text-white/25 focus:border-emerald-500/50 focus:bg-white/[0.07] focus:ring-1 focus:ring-emerald-500/30"
                   placeholder="Votre nom"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
                   autoComplete="name"
                   required
                 />
@@ -185,7 +189,7 @@ export default function LoginPage() {
                 className="h-11 border-white/[0.08] bg-white/[0.04] pl-10 text-sm text-white placeholder:text-white/25 focus:border-emerald-500/50 focus:bg-white/[0.07] focus:ring-1 focus:ring-emerald-500/30"
                 placeholder="email@example.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                 autoComplete="email"
                 required
               />
@@ -201,7 +205,7 @@ export default function LoginPage() {
                 className="h-11 border-white/[0.08] bg-white/[0.04] pl-10 text-sm text-white placeholder:text-white/25 focus:border-emerald-500/50 focus:bg-white/[0.07] focus:ring-1 focus:ring-emerald-500/30"
                 placeholder="••••••••"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                 autoComplete={isSignIn ? "current-password" : "new-password"}
                 required
               />
@@ -240,5 +244,19 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPageWrapper() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="flex min-h-dvh items-center justify-center bg-slate-950">
+          <Loader2 className="animate-spin text-emerald-400" size={36} />
+        </div>
+      }
+    >
+      <LoginPage />
+    </React.Suspense>
   );
 }

@@ -1,0 +1,79 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - Production
+      - Dev
+  pull_request:
+    branches:
+      - Production
+      - Dev
+
+jobs:
+  lint-and-test:
+    name: 🧪 CI (Lint, Typecheck, Test & Build)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Generate Prisma client
+        run: npm run db:generate -w @pocket-maps/database
+
+      - name: Lint
+        run: npm run lint --workspaces --if-present
+
+      - name: Typecheck server
+        run: npx tsc -p apps/server/tsconfig.json --noEmit
+
+      - name: Test (server)
+        run: npm run test -w @pocket-maps/server
+
+      - name: Build client
+        run: npm run build -w @pocket-maps/client
+
+  deploy:
+    name: 🚀 Deploy to Production Server
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/Production'
+
+    steps:
+      - name: Executing remote ssh commands to deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            set -e
+            export DEPLOY_PATH="/srv/flipper-website"
+
+            echo "--- Dossier $DEPLOY_PATH ---"
+            cd "$DEPLOY_PATH" || exit 1
+
+            echo "--- Pull source (Production) ---"
+            git fetch origin Production
+            git reset --hard origin/Production
+
+            echo "--- Build & restart services ---"
+            docker compose down
+            docker compose up -d --build
+
+            echo "--- Apply DB migrations ---"
+            docker compose exec -T server npx prisma migrate deploy \
+              --schema /app/packages/database/prisma/schema.prisma
+
+            echo "--- Cleanup ---"
+            docker image prune -f --filter "until=24h"

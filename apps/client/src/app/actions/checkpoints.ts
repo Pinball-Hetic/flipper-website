@@ -25,7 +25,7 @@ export async function getCheckpoints(): Promise<CheckpointWithPosition[]> {
     },
   });
 
-  const withoutLocation = rows.map((c) => {
+  const withoutLocation = rows.map((c: (typeof rows)[number]) => {
     const { location: _loc, ...rest } = c as typeof c & { location?: unknown };
     return rest;
   });

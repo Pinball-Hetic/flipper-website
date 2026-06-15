@@ -27,7 +27,7 @@ export default function Home() {
     retry: 2,
   });
 
-  const mapPosition = position ?? defaultPosition;
+  const mapPosition = (position ?? defaultPosition) as [number, number];
 
   return (
     <div className="h-screen w-screen overflow-hidden">

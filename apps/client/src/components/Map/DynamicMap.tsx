@@ -108,7 +108,7 @@ export default function DynamicMap({ position, checkpoints, geoLoading }: Props)
         </Marker>
 
         {checkpoints?.map((cp) => (
-          <Marker key={cp.id} position={cp.position} icon={icons.createCheckpoint(cp.type)}>
+          <Marker key={cp.id} position={cp.position} icon={icons.createCheckpoint(cp.type) ?? undefined}>
             <Popup className="custom-popup" maxWidth={280} closeButton={false}>
               <div className="flex flex-col p-6 w-64 gap-4">
                 <div className="flex flex-col gap-1.5">

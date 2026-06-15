@@ -332,7 +332,7 @@ export function ProfileModal({ isOpen, onOpenChange }: ProfileModalProps) {
                         className="h-14 pl-12 rounded-2xl bg-white/50 border-white/60 focus:bg-white transition-all shadow-xs"
                         placeholder="Votre nom"
                         value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
                         required={!isSignIn}
                       />
                     </div>
@@ -353,7 +353,7 @@ export function ProfileModal({ isOpen, onOpenChange }: ProfileModalProps) {
                       className="h-14 pl-12 rounded-2xl bg-white/50 border-white/60 focus:bg-white transition-all shadow-xs"
                       placeholder="email@example.com"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                       required
                     />
                   </div>
@@ -373,7 +373,7 @@ export function ProfileModal({ isOpen, onOpenChange }: ProfileModalProps) {
                       className="h-14 pl-12 rounded-2xl bg-white/50 border-white/60 focus:bg-white transition-all shadow-xs"
                       placeholder="••••••••"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                       required
                     />
                   </div>
