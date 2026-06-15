@@ -3,5 +3,10 @@ export interface IUserRepository {
   findByPseudo(pseudoLower: string): Promise<{ id: string } | null>;
   findById(
     userId: string,
-  ): Promise<{ id: string; pseudo: string | null; pseudoUpdatedAt: Date | null } | null>;
+  ): Promise<{
+    id: string;
+    pseudo: string | null;
+    pseudoUpdatedAt: Date | null;
+    role: string;
+  } | null>;
 }
