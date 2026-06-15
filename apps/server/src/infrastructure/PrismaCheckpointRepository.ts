@@ -46,6 +46,13 @@ export class PrismaCheckpointRepository implements ICheckpointRepository {
     });
   }
 
+  async setOwner(id: string, ownerUserId: string | null): Promise<void> {
+    await prisma.checkpoint.update({
+      where: { id },
+      data: { ownerUserId },
+    });
+  }
+
   async list(opts: { ownerUserId?: string }): Promise<Checkpoint[]> {
     const rows = await prisma.checkpoint.findMany({
       where: opts.ownerUserId ? { ownerUserId: opts.ownerUserId } : undefined,
