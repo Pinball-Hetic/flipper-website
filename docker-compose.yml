@@ -6,7 +6,7 @@ services:
       dockerfile: apps/gateway/Dockerfile
     container_name: pocket-maps-gateway
     ports:
-      - "8881:8881"
+      - "127.0.0.1:8881:8881"
     env_file: .env
     depends_on:
       - client
@@ -17,6 +17,8 @@ services:
     build:
       context: .
       dockerfile: apps/client/Dockerfile
+      args:
+        - NEXT_PUBLIC_SERVER_URL=${NEXT_PUBLIC_SERVER_URL}
     container_name: pocket-maps-client
     expose:
       - "8888"
@@ -32,8 +34,8 @@ services:
       context: .
       dockerfile: apps/server/Dockerfile
     container_name: pocket-maps-server
-    expose:
-      - "8882"
+    ports:
+      - "127.0.0.1:8882:8882"
     env_file: .env
     environment:
       - NODE_ENV=production
