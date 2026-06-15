@@ -1,45 +1,25 @@
 {
-  "name": "flipper-website",
-  "version": "0.1.0",
-  "type": "module",
+  "name": "pocket-maps-monorepo",
+  "version": "1.0.0",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
-    "test:smoke": "python3 /Users/anthonyzhao/.agents/skills/webapp-testing/scripts/with_server.py --server \"npm run dev -- --port 3123\" --port 3123 -- python3 tests/smoke_test.py"
-  },
-  "dependencies": {
-    "clsx": "^2.1.1",
-    "framer-motion": "^11.11.17",
-    "leaflet": "^1.9.4",
-    "lucide-react": "^0.454.0",
-    "next": "15.0.3",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "react-leaflet": "^4.2.1",
-    "tailwind-merge": "^2.5.4"
+    "dev": "concurrently \"npm run dev -w @pocket-maps/client\" \"npm run dev -w @pocket-maps/server\" \"npm run dev -w @pocket-maps/gateway\"",
+    "build": "npm run build --workspaces --if-present",
+    "start": "npm run start --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "db:push": "npm run db:push -w @pocket-maps/database",
+    "db:generate": "npm run db:generate -w @pocket-maps/database",
+    "db:seed": "npm run db:seed -w @pocket-maps/database",
+    "docker:dev:up": "docker compose -f docker-compose.dev.yml up -d --build"
   },
   "devDependencies": {
-    "@babel/core": "^7.29.0",
-    "@babel/preset-env": "^7.29.2",
-    "@babel/preset-react": "^7.28.5",
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.2",
-    "autoprefixer": "^10.4.20",
-    "babel-jest": "^30.3.0",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "15.0.3",
-    "identity-obj-proxy": "^3.0.0",
-    "jest": "^30.3.0",
-    "jest-environment-jsdom": "^30.3.0",
-    "jsdom": "^27.0.1",
-    "postcss": "^8.4.47",
-    "tailwindcss": "^3.4.14"
+    "concurrently": "^9.1.0"
+  },
+  "dependencies": {
+    "sonner": "^2.0.7"
   }
 }

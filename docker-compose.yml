@@ -1,13 +1,40 @@
-version: '3.8'
-
+# Architecture de Production Monorepo Pocket Maps
 services:
-  next-app:
+  gateway:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: flipper-website
+      dockerfile: apps/gateway/Dockerfile
+    container_name: pocket-maps-gateway
     ports:
-      - "3000:3000"
+      - "8881:8881"
+    env_file: .env
+    depends_on:
+      - client
+      - server
+    restart: always
+
+  client:
+    build:
+      context: .
+      dockerfile: apps/client/Dockerfile
+    container_name: pocket-maps-client
+    expose:
+      - "8888"
+    env_file: .env
+    environment:
+      - NODE_ENV=production
+      - CLIENT_URL=http://client:8888
+      - SERVER_URL=http://server:8882
+    restart: always
+
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    container_name: pocket-maps-server
+    expose:
+      - "8882"
+    env_file: .env
     environment:
       - NODE_ENV=production
     restart: always

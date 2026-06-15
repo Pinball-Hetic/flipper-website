@@ -1,0 +1,21 @@
+FROM node:22-alpine
+WORKDIR /app
+
+# Copier les manifests
+COPY package.json package-lock.json* ./
+COPY apps/server/package.json ./apps/server/
+COPY packages/database/package.json ./packages/database/
+
+# Copier le code local des packages internes pour résoudre les liens symboliques (symlinks)
+COPY packages/database ./packages/database
+
+RUN npm install
+
+# Copier le reste du code
+COPY . .
+
+# Générer Prisma
+RUN npm run db:generate -w @pocket-maps/database
+
+EXPOSE 8882
+CMD ["npm", "run", "dev", "-w", "@pocket-maps/server"]

@@ -1,12 +1,13 @@
 # Dependencies
-/node_modules
-/.pnp
+node_modules
+.pnp
 .pnp.js
 .yarn/install-state.gz
 
 # Next.js
-/.next/
-/out/
+.next/
+apps/client/.next/
+out/
 
 # Production
 /build
@@ -30,8 +31,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Docker
-.dockerignore
 # Docker containers storage
 /docker/data
 
@@ -52,3 +51,20 @@ logs
 *.njsproj
 *.sln
 *.sw?
+
+/src/generated/prisma
+
+.env
+
+Pinball-website-brain
+
+graphify-out/
+
+# Obsidian vault — local only
+Pinball-website-brain/.obsidian/
+Pinball-website-brain/03_Journal_de_Bord/
+Pinball-website-brain/05_Bugs_Resolus/
+Pinball-website-brain/_COMMUNITY_*
+Pinball-website-brain/graph.canvas
+Pinball-website-brain/graph.json
+Pinball-website-brain/graphify-out/

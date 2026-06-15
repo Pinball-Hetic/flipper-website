@@ -1,0 +1,57 @@
+# Développement : Next.js, Express et Gateway en mode dev — `docker compose -f docker-compose.dev.yml up --build`
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: apps/gateway/Dockerfile.dev
+    container_name: pocket-maps-gateway-dev
+    ports:
+      - "8881:8881"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - SERVER_URL=http://server:8882
+      - CLIENT_URL=http://client:8888
+      - GATEWAY_PORT=8881
+    restart: unless-stopped
+
+  client:
+    build:
+      context: .
+      dockerfile: apps/client/Dockerfile.dev
+    container_name: pocket-maps-client-dev
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/client/.next
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true
+      - NEXT_TELEMETRY_DISABLED=1
+      - NEXT_PUBLIC_SERVER_URL=http://localhost:8882
+    restart: unless-stopped
+
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile.dev
+    container_name: pocket-maps-server-dev
+    ports:
+      - "8882:8882"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - NODE_ENV=development
+      - AUTH_URL=http://client:8888
+    restart: unless-stopped

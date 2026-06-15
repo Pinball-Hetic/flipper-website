@@ -1,0 +1,98 @@
+version: "3"
+
+tasks:
+  # 🛠️ Development (Local - hors Docker)
+  dev:
+    desc: "Start all services in development mode (Client, Server, Gateway)"
+    cmds:
+      - npm run dev
+
+  dev:client:
+    desc: "Start only the client"
+    cmds:
+      - npm run dev -w @pocket-maps/client
+
+  dev:server:
+    desc: "Start only the server"
+    cmds:
+      - npm run dev -w @pocket-maps/server
+
+  dev:gateway:
+    desc: "Start only the gateway"
+    cmds:
+      - npm run dev -w @pocket-maps/gateway
+
+  # 🔍 Qualité
+  lint:
+    desc: "Vérifier les erreurs ESLint du client"
+    cmds:
+      - npm run lint -w @pocket-maps/client
+
+  # 🗄️ Database (packages/database)
+  db:generate:
+    desc: "Generate Prisma Client"
+    cmds:
+      - npm run db:generate -w @pocket-maps/database
+
+  db:migrate:
+    desc: "Run Prisma migrations (dev) — requires DATABASE_URL"
+    cmds:
+      - npm run db:migrate -w @pocket-maps/database -- --name {{.NAME}}
+
+  db:migrate:deploy:
+    desc: "Apply pending migrations (production)"
+    cmds:
+      - npm run db:migrate:deploy -w @pocket-maps/database
+
+  db:push:
+    desc: "Push schema changes to the database"
+    cmds:
+      - npm run db:push -w @pocket-maps/database
+
+  db:seed:
+    desc: "Seed the database"
+    cmds:
+      - npm run db:seed -w @pocket-maps/database
+
+  db:studio:
+    desc: "Open Prisma Studio"
+    cmds:
+      - npm run db:studio -w @pocket-maps/database
+
+  # 🐳 Docker (Orchestration)
+  up:
+    desc: "Start development environment (Docker)"
+    cmds:
+      - docker compose -f docker-compose.dev.yml up -d --build
+
+  down:
+    desc: "Stop development environment (Docker, keeps volumes)"
+    cmds:
+      - docker compose -f docker-compose.dev.yml down
+
+  down:clean:
+    desc: "Stop development environment and DELETE volumes (destructive)"
+    cmds:
+      - docker compose -f docker-compose.dev.yml down -v
+
+  logs:
+    desc: "View development logs"
+    cmds:
+      - docker compose -f docker-compose.dev.yml logs -f
+
+  prod:up:
+    desc: "Start production environment (Docker)"
+    cmds:
+      - docker compose up -d --build
+
+  prod:down:
+    desc: "Stop production environment (Docker)"
+    cmds:
+      - docker compose down
+
+  # 🧹 Maintenance
+  clean:
+    desc: "Remove all node_modules and build artifacts"
+    cmds:
+      - rm -rf node_modules apps/*/node_modules apps/*/.next packages/*/node_modules
+      - docker system prune -f
