@@ -21,7 +21,12 @@ export interface IBorneScoreRepository {
 
   existsByCode(code: string): Promise<boolean>;
 
-  claimByCode(code: string, pseudo: string, claimedAt: Date): Promise<boolean>;
+  claimByCode(
+    code: string,
+    pseudo: string,
+    claimedAt: Date,
+    userId?: string,
+  ): Promise<boolean>;
 
   topByMap(mapId: string, limit: number): Promise<BorneScore[]>;
 }
