@@ -29,6 +29,23 @@ export class PrismaCheckpointRepository implements ICheckpointRepository {
     return row ? this.toDomain(row) : null;
   }
 
+  // toDomain ne mappe pas tokenHash → le hash ne fuite jamais dans l'entité.
+  async findByTokenHash(tokenHash: string): Promise<Checkpoint | null> {
+    const row = await prisma.checkpoint.findUnique({ where: { tokenHash } });
+    return row ? this.toDomain(row) : null;
+  }
+
+  async setToken(
+    id: string,
+    tokenHash: string | null,
+    tokenCreatedAt: Date | null,
+  ): Promise<void> {
+    await prisma.checkpoint.update({
+      where: { id },
+      data: { tokenHash, tokenCreatedAt },
+    });
+  }
+
   async list(opts: { ownerUserId?: string }): Promise<Checkpoint[]> {
     const rows = await prisma.checkpoint.findMany({
       where: opts.ownerUserId ? { ownerUserId: opts.ownerUserId } : undefined,
