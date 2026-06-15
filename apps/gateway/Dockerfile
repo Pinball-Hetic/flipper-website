@@ -4,13 +4,18 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
+COPY apps/client/package.json ./apps/client/
+COPY apps/server/package.json ./apps/server/
 COPY apps/gateway/package.json ./apps/gateway/
+COPY packages/database/package.json ./packages/database/
+COPY packages/shared/package.json ./packages/shared/
 RUN npm install
 
 # Stage 2: Builder
 FROM node:22-alpine AS builder
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+# Copie l'arbre node_modules COMPLET (racine + node_modules imbriqués par workspace)
+COPY --from=deps /app/ ./
 COPY . .
 
 # Stage 3: Runner
