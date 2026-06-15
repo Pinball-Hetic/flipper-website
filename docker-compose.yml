@@ -8,6 +8,9 @@ services:
     ports:
       - "127.0.0.1:8881:8881"
     env_file: .env
+    environment:
+      - CLIENT_URL=http://client:8888
+      - SERVER_URL=http://server:8882
     depends_on:
       - client
       - server
