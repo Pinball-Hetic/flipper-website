@@ -1,3 +1,10 @@
+export interface UserSummary {
+  id: string;
+  email: string;
+  pseudo: string | null;
+  role: string;
+}
+
 export interface IUserRepository {
   setPseudo(userId: string, pseudo: string, pseudoLower: string): Promise<void>;
   findByPseudo(pseudoLower: string): Promise<{ id: string } | null>;
@@ -9,4 +16,6 @@ export interface IUserRepository {
     pseudoUpdatedAt: Date | null;
     role: string;
   } | null>;
+  list(): Promise<UserSummary[]>;
+  updateRole(userId: string, role: string): Promise<void>;
 }

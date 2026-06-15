@@ -33,4 +33,5 @@ export interface ICheckpointRepository {
     tokenHash: string | null,
     tokenCreatedAt: Date | null,
   ): Promise<void>;
+  setOwner(id: string, ownerUserId: string | null): Promise<void>;
 }
