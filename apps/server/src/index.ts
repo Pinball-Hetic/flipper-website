@@ -9,6 +9,7 @@ import { ClaimController } from "./interface/ClaimController";
 import { CheckpointController } from "./interface/CheckpointController";
 import { UserController } from "./interface/UserController";
 import { PseudoController } from "./interface/PseudoController";
+import { AdminController } from "./interface/AdminController";
 import { MachineController } from "./interface/MachineController";
 import { V1ScoreController } from "./interface/V1ScoreController";
 import { V1ClaimController } from "./interface/V1ClaimController";
@@ -61,6 +62,7 @@ app.get("/api/users/:id/stats", UserController.getStats);
 app.post("/api/users/pseudo", PseudoController.set);
 app.get("/api/users/pseudo/check", PseudoController.check);
 app.get("/api/machines", MachineController.getAll);
+app.get("/api/admin/ping", AdminController.ping);
 
 app.post("/api/scores", ScoreController.handle);
 app.post("/api/pending-scores", PendingScoreController.handle);
