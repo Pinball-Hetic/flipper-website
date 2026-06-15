@@ -21,17 +21,15 @@ app.use((req, res, next) => {
 });
 
 // 1. Redirection spécifique pour le Serveur API (SAUF /api/auth)
+// Proxy créé UNE seule fois au démarrage (sinon fuite mémoire : une instance par requête)
+const apiProxy = createProxyMiddleware({ target: SERVER_TARGET, changeOrigin: true });
 app.use('/api', (req, res, next) => {
   if (req.url.startsWith('/auth') || req.path.startsWith('/auth')) {
     // Si c'est de l'auth, on ne traite pas ici, on laisse passer au proxy suivant (le client)
     return next();
   }
-  
   // Sinon, on envoie vers le serveur Express
-  return createProxyMiddleware({
-    target: SERVER_TARGET,
-    changeOrigin: true,
-  })(req, res, next);
+  return apiProxy(req, res, next);
 });
 
 // 1bis. Contrat /v1 (bornes) vers le Serveur Express
