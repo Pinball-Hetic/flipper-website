@@ -120,6 +120,8 @@ model Checkpoint {
   location    Unsupported("geography(Point, 4326)")?
   cabinetId   String?  @unique
   ownerUserId String?
+  tokenHash      String?   @unique
+  tokenCreatedAt DateTime?
   createdAt   DateTime @default(now())
 
   // Relations
