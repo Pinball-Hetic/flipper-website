@@ -23,6 +23,7 @@ model User {
   pseudo          String?     @unique
   pseudoLower     String?     @unique
   pseudoUpdatedAt DateTime?
+  role            String      @default("user")
   
   // Auth relations
   sessions      Session[]
