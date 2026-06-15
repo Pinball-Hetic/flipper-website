@@ -7,9 +7,40 @@ import {
   NoPseudoError,
   UserNotFoundError,
 } from "../use-cases/ClaimBorneScore";
+import { RecordAccountScore } from "../use-cases/RecordAccountScore";
 import { PrismaBorneScoreRepository } from "../infrastructure/PrismaBorneScoreRepository";
 import { PrismaUserRepository } from "../infrastructure/PrismaUserRepository";
+import { PrismaCheckpointRepository } from "../infrastructure/PrismaCheckpointRepository";
+import { PrismaMachineRepository } from "../infrastructure/PrismaMachineRepository";
+import { PrismaScoreRepository } from "../infrastructure/PrismaScoreRepository";
 import { resolveSession } from "./resolveSession";
+
+import type { BorneScore } from "../domain/BorneScore";
+
+// Pont /v1 → Score : best-effort, ne doit JAMAIS casser la réponse de claim.
+async function bridgeAccountScore(borne: BorneScore, userId: string): Promise<void> {
+  try {
+    const useCase = new RecordAccountScore(
+      new PrismaCheckpointRepository(),
+      new PrismaMachineRepository(),
+      new PrismaScoreRepository(),
+    );
+    const score = await useCase.execute({
+      cabinetId: borne.cabinetId,
+      mapId: borne.mapId,
+      value: borne.score,
+      userId,
+      playedAt: borne.playedAt,
+    });
+    if (!score) {
+      console.warn(
+        `[V1ClaimController] borne ${borne.cabinetId} non enregistrée — Score non écrit (skip).`,
+      );
+    }
+  } catch (err) {
+    console.error("[V1ClaimController] échec du pont RecordAccountScore:", err);
+  }
+}
 
 export class V1ClaimController {
   static async get(req: Request, res: Response): Promise<void> {
@@ -47,9 +78,14 @@ export class V1ClaimController {
     const userId = await resolveSession(req);
 
     try {
-      const pseudo = userId
+      const { pseudo, borne } = userId
         ? await useCase.execute(code, { userId })
         : await useCase.execute(code, { pseudo: req.body?.pseudo });
+
+      // Claim PAR COMPTE → matérialise un Score dans les affichages existants.
+      // Claim anonyme → aucun Score (reste dans borne_score / leaderboard /v1).
+      if (userId) await bridgeAccountScore(borne, userId);
+
       res.status(200).json({ ok: true, pseudo });
     } catch (err) {
       if (err instanceof NoPseudoError) {
