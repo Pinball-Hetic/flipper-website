@@ -5,9 +5,13 @@ import { ListBornes } from "./ListBornes";
 import { GetBorne } from "./GetBorne";
 import { GenerateBorneToken, hashToken } from "./GenerateBorneToken";
 import { RevokeBorneToken } from "./RevokeBorneToken";
+import { AssignBorneOwner, UserNotFoundError } from "./AssignBorneOwner";
+import { SetUserRole } from "./SetUserRole";
+import { ListUsers } from "./ListUsers";
 import { ValidationError } from "./RegisterScore";
 import type { Checkpoint } from "../domain/Checkpoint";
 import type { ICheckpointRepository } from "../domain/ICheckpointRepository";
+import type { IUserRepository } from "../domain/IUserRepository";
 
 const makeCheckpoint = (overrides: Partial<Checkpoint> = {}): Checkpoint => ({
   id: "cp-1",
@@ -31,6 +35,7 @@ const makeRepo = (
   list: vi.fn().mockResolvedValue([makeCheckpoint()]),
   existsByCabinetId: vi.fn().mockResolvedValue(false),
   setToken: vi.fn().mockResolvedValue(undefined),
+  setOwner: vi.fn().mockResolvedValue(undefined),
   ...overrides,
 });
 
@@ -196,5 +201,90 @@ describe("RevokeBorneToken", () => {
     const useCase = new RevokeBorneToken(repo);
     await expect(useCase.execute("ghost")).rejects.toThrow(CheckpointNotFoundError);
     expect(repo.setToken).not.toHaveBeenCalled();
+  });
+});
+
+const makeUserRepo = (
+  overrides: Partial<IUserRepository> = {},
+): IUserRepository => ({
+  setPseudo: vi.fn(),
+  findByPseudo: vi.fn().mockResolvedValue(null),
+  findById: vi
+    .fn()
+    .mockResolvedValue({ id: "user-1", pseudo: "X", pseudoUpdatedAt: null, role: "manager" }),
+  list: vi.fn().mockResolvedValue([]),
+  updateRole: vi.fn().mockResolvedValue(undefined),
+  ...overrides,
+});
+
+describe("AssignBorneOwner", () => {
+  it("assigne un owner existant", async () => {
+    const repo = makeRepo();
+    const users = makeUserRepo();
+    const useCase = new AssignBorneOwner(repo, users);
+    const result = await useCase.execute("cp-1", "user-1");
+    expect(repo.setOwner).toHaveBeenCalledWith("cp-1", "user-1");
+    expect(result.ownerUserId).toBe("user-1");
+  });
+
+  it("permet de désassigner (null) sans vérifier l'user", async () => {
+    const repo = makeRepo();
+    const users = makeUserRepo();
+    const useCase = new AssignBorneOwner(repo, users);
+    await useCase.execute("cp-1", null);
+    expect(users.findById).not.toHaveBeenCalled();
+    expect(repo.setOwner).toHaveBeenCalledWith("cp-1", null);
+  });
+
+  it("lève CheckpointNotFoundError si borne absente", async () => {
+    const repo = makeRepo({ findById: vi.fn().mockResolvedValue(null) });
+    const useCase = new AssignBorneOwner(repo, makeUserRepo());
+    await expect(useCase.execute("ghost", "user-1")).rejects.toThrow(
+      CheckpointNotFoundError,
+    );
+  });
+
+  it("lève UserNotFoundError si user cible absent", async () => {
+    const repo = makeRepo();
+    const users = makeUserRepo({ findById: vi.fn().mockResolvedValue(null) });
+    const useCase = new AssignBorneOwner(repo, users);
+    await expect(useCase.execute("cp-1", "ghost")).rejects.toThrow(UserNotFoundError);
+    expect(repo.setOwner).not.toHaveBeenCalled();
+  });
+});
+
+describe("SetUserRole", () => {
+  it("met à jour un rôle valide", async () => {
+    const users = makeUserRepo();
+    const useCase = new SetUserRole(users);
+    await useCase.execute("user-1", "manager");
+    expect(users.updateRole).toHaveBeenCalledWith("user-1", "manager");
+  });
+
+  it("lève ValidationError sur rôle invalide", async () => {
+    const users = makeUserRepo();
+    const useCase = new SetUserRole(users);
+    await expect(useCase.execute("user-1", "superboss")).rejects.toThrow(ValidationError);
+    expect(users.updateRole).not.toHaveBeenCalled();
+  });
+
+  it("lève UserNotFoundError si user absent", async () => {
+    const users = makeUserRepo({ findById: vi.fn().mockResolvedValue(null) });
+    const useCase = new SetUserRole(users);
+    await expect(useCase.execute("ghost", "admin")).rejects.toThrow(UserNotFoundError);
+  });
+});
+
+describe("ListUsers", () => {
+  it("retourne la liste des users", async () => {
+    const users = makeUserRepo({
+      list: vi.fn().mockResolvedValue([
+        { id: "u1", email: "a@b.c", pseudo: "A", role: "admin" },
+      ]),
+    });
+    const useCase = new ListUsers(users);
+    const result = await useCase.execute();
+    expect(result).toHaveLength(1);
+    expect(users.list).toHaveBeenCalled();
   });
 });

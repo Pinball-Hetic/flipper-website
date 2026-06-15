@@ -38,6 +38,7 @@ const makeCheckpoints = (
   list: vi.fn(),
   existsByCabinetId: vi.fn(),
   setToken: vi.fn(),
+  setOwner: vi.fn(),
 });
 
 const makeMachines = (

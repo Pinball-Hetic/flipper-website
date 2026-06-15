@@ -45,6 +45,8 @@ const makeUserRepo = (
   setPseudo: vi.fn(),
   findByPseudo: vi.fn().mockResolvedValue(null),
   findById: vi.fn().mockResolvedValue(user),
+  list: vi.fn().mockResolvedValue([]),
+  updateRole: vi.fn(),
 });
 
 describe("ClaimBorneScore — invité", () => {
