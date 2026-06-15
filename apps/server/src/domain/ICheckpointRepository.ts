@@ -24,6 +24,13 @@ export interface ICheckpointRepository {
   update(id: string, data: UpdateCheckpointData): Promise<Checkpoint>;
   findById(id: string): Promise<Checkpoint | null>;
   findByCabinetId(cabinetId: string): Promise<Checkpoint | null>;
+  findByTokenHash(tokenHash: string): Promise<Checkpoint | null>;
   list(opts: { ownerUserId?: string }): Promise<Checkpoint[]>;
   existsByCabinetId(cabinetId: string): Promise<boolean>;
+  // tokenHash reste interne au repo — jamais exposé dans l'entité Checkpoint.
+  setToken(
+    id: string,
+    tokenHash: string | null,
+    tokenCreatedAt: Date | null,
+  ): Promise<void>;
 }
