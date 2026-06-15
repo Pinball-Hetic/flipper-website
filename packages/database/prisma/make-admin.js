@@ -9,9 +9,9 @@
 const { PrismaClient } = require('@prisma/client');
 const { PrismaPg } = require('@prisma/adapter-pg');
 const pg = require('pg');
-const dotenv = require('dotenv');
 
-dotenv.config({ override: true });
+// Charge le .env racine (cwd = packages/database via workspace, .env vit à la racine du repo).
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../../.env'), override: true });
 
 const connectionString = process.env.DATABASE_URL;
 const pool = new pg.Pool({ connectionString });
