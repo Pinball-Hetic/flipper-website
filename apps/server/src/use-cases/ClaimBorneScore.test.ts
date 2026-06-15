@@ -52,7 +52,8 @@ describe("ClaimBorneScore — invité", () => {
     const repo = makeRepo(makeBorne());
     const useCase = new ClaimBorneScore(repo, makeUserRepo());
     const result = await useCase.execute("123456", { pseudo: "Lucas_42" });
-    expect(result).toBe("LUCAS_42");
+    expect(result.pseudo).toBe("LUCAS_42");
+    expect(result.borne.code).toBe("123456");
     expect(repo.claimByCode).toHaveBeenCalledWith(
       "123456",
       "LUCAS_42",
@@ -126,7 +127,7 @@ describe("ClaimBorneScore — compte connecté", () => {
     });
     const useCase = new ClaimBorneScore(repo, userRepo);
     const result = await useCase.execute("123456", { userId: "user-1" });
-    expect(result).toBe("BallWizard");
+    expect(result.pseudo).toBe("BallWizard");
     expect(repo.claimByCode).toHaveBeenCalledWith(
       "123456",
       "BallWizard",
@@ -168,6 +169,6 @@ describe("ClaimBorneScore — compte connecté", () => {
       userId: "user-1",
       pseudo: "spoofed",
     });
-    expect(result).toBe("BallWizard");
+    expect(result.pseudo).toBe("BallWizard");
   });
 });

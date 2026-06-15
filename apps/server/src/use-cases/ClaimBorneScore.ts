@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { BorneScore } from "../domain/BorneScore";
 import type { IBorneScoreRepository } from "../domain/IBorneScoreRepository";
 import type { IUserRepository } from "../domain/IUserRepository";
 import { validatePseudo, isProfane, InvalidPseudoError } from "../domain/Pseudo";
@@ -40,7 +41,10 @@ export class ClaimBorneScore {
     private users: IUserRepository,
   ) {}
 
-  async execute(code: string, input: ClaimBorneScoreInput): Promise<string> {
+  async execute(
+    code: string,
+    input: ClaimBorneScoreInput,
+  ): Promise<{ pseudo: string; borne: BorneScore }> {
     const parsed = ClaimBorneScoreSchema.safeParse(input);
     if (!parsed.success) throw new InvalidPseudoError("Requête invalide");
 
@@ -64,7 +68,7 @@ export class ClaimBorneScore {
     );
     if (!claimed) throw new BorneAlreadyClaimedError();
 
-    return pseudo;
+    return { pseudo, borne };
   }
 
   private async resolveAccount(
