@@ -34,6 +34,18 @@ export async function middleware(request) {
     const session = await res.json();
     const pseudo = session?.user?.pseudo;
 
+    if (pathname.startsWith("/admin")) {
+      if (!session?.user) {
+        const loginUrl = new URL("/login", request.url);
+        loginUrl.searchParams.set("redirect", pathname + search);
+        return NextResponse.redirect(loginUrl);
+      }
+      if (session.user.role !== "admin") {
+        return NextResponse.redirect(new URL("/", request.url));
+      }
+      return NextResponse.next();
+    }
+
     if (session?.user && (pseudo === null || pseudo === undefined)) {
       const onboardingUrl = new URL("/onboarding", request.url);
       onboardingUrl.searchParams.set("redirect", pathname + search);
