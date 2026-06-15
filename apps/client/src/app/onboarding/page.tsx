@@ -1,18 +1,21 @@
 "use client";
 
+import { Suspense } from "react";
 import { authClient } from "@/lib/auth-client";
 import { PseudoForm } from "@/components/pseudo/PseudoForm";
 import { Loader2, Zap } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function OnboardingPage() {
+function OnboardingPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") ?? "/";
   const { data: session, isPending } = authClient.useSession();
 
   const handleSuccess = (_pseudo: string) => {
     // Force a full navigation so the middleware re-evaluates the session
     // (pseudo is now set — the onboarding redirect must not fire again).
-    router.push("/");
+    router.push(redirectTo);
     router.refresh();
   };
 
@@ -63,5 +66,19 @@ export default function OnboardingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function OnboardingPageWrapper() {
+  return (
+    <Suspense
+      fallback={
+        <div className="fixed inset-0 flex items-center justify-center bg-slate-900">
+          <Loader2 className="animate-spin text-orange-500" size={40} />
+        </div>
+      }
+    >
+      <OnboardingPage />
+    </Suspense>
   );
 }
