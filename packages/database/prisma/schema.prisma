@@ -198,6 +198,7 @@ model BorneScore {
   pseudo        String?
   claimed       Boolean  @default(false)
   claimedAt     DateTime?
+  claimedByUserId String?
   expiresAt     DateTime
   createdAt     DateTime @default(now())
 
