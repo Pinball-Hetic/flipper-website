@@ -1,33 +1,118 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ShieldCheck, ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Plus, Loader2, MapPin, Cpu, AlertTriangle } from "lucide-react";
+import { listBornes, type AdminBorne } from "@/lib/admin-api";
 
-export default function AdminDashboard() {
+type State =
+  | { kind: "loading" }
+  | { kind: "ready"; bornes: AdminBorne[] }
+  | { kind: "error"; message: string };
+
+export default function AdminBornesList() {
+  const router = useRouter();
+  const [state, setState] = useState<State>({ kind: "loading" });
+
+  useEffect(() => {
+    let cancelled = false;
+    listBornes()
+      .then((bornes) => {
+        if (!cancelled) setState({ kind: "ready", bornes });
+      })
+      .catch((err: Error) => {
+        if (cancelled) return;
+        if (/40[13]/.test(err.message)) {
+          router.replace("/");
+          return;
+        }
+        setState({ kind: "error", message: err.message });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
+
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center bg-slate-950 p-6 text-white">
-      <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-slate-900/80 p-8 shadow-2xl shadow-black/40">
-        <div className="flex items-center gap-3">
-          <div className="flex size-11 items-center justify-center rounded-2xl border border-orange-500/30 bg-orange-500/15">
-            <ShieldCheck className="size-6 text-orange-400" aria-hidden />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold tracking-tight">Dashboard admin</h1>
-            <p className="text-sm text-white/50">Gestion des bornes — à venir</p>
-          </div>
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Bornes</h1>
+          <p className="mt-1 text-sm text-white/50">
+            Gère le registre des bornes et leurs tokens.
+          </p>
         </div>
-
-        <p className="mt-6 text-sm leading-relaxed text-white/60">
-          Espace réservé aux administrateurs. Les fonctionnalités de gestion des
-          bornes arriveront dans les prochaines phases.
-        </p>
-
         <Link
-          href="/"
-          className="mt-8 inline-flex items-center gap-2 text-xs text-white/40 underline-offset-4 transition-colors hover:text-white/70 hover:underline"
+          href="/admin/bornes/new"
+          className="inline-flex h-11 items-center gap-2 rounded-xl bg-orange-500 px-4 text-sm font-semibold text-white transition-colors hover:bg-orange-400"
         >
-          <ArrowLeft className="size-3.5" aria-hidden />
-          Retour à la carte
+          <Plus className="size-4" aria-hidden />
+          Créer une borne
         </Link>
       </div>
-    </main>
+
+      {state.kind === "loading" && (
+        <div className="flex flex-col items-center gap-3 py-16 text-white/50">
+          <Loader2 className="size-6 animate-spin motion-reduce:animate-none" aria-hidden />
+          <p className="text-sm">Chargement des bornes…</p>
+        </div>
+      )}
+
+      {state.kind === "error" && (
+        <div
+          role="alert"
+          className="flex flex-col items-center gap-3 rounded-2xl border border-red-500/30 bg-red-950/40 px-5 py-10 text-center"
+        >
+          <AlertTriangle className="size-7 text-red-400" aria-hidden />
+          <p className="text-sm text-red-300/80">{state.message}</p>
+        </div>
+      )}
+
+      {state.kind === "ready" && state.bornes.length === 0 && (
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-white/10 bg-slate-900/50 px-5 py-16 text-center">
+          <Cpu className="size-8 text-white/30" aria-hidden />
+          <p className="text-sm text-white/50">Aucune borne pour l&apos;instant.</p>
+          <Link
+            href="/admin/bornes/new"
+            className="mt-1 text-sm font-semibold text-orange-400 hover:text-orange-300"
+          >
+            Créer la première
+          </Link>
+        </div>
+      )}
+
+      {state.kind === "ready" && state.bornes.length > 0 && (
+        <ul className="flex flex-col gap-2.5">
+          {state.bornes.map((b) => (
+            <li key={b.id}>
+              <Link
+                href={`/admin/bornes/${b.id}`}
+                className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-slate-900/60 px-5 py-4 transition-colors hover:border-white/20 hover:bg-slate-900"
+              >
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="truncate font-semibold">{b.name}</span>
+                    <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white/40">
+                      {b.type}
+                    </span>
+                  </div>
+                  <div className="mt-1 flex items-center gap-3 text-xs text-white/40">
+                    <span className="font-mono text-emerald-400/80">
+                      {b.cabinetId ?? "—"}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <MapPin className="size-3" aria-hidden />
+                      {b.lat.toFixed(4)}, {b.lng.toFixed(4)}
+                    </span>
+                  </div>
+                </div>
+                <span className="shrink-0 text-xs text-white/30">Détails →</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
