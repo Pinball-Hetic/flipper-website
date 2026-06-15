@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { X, QrCode } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -49,13 +49,15 @@ export function ClaimModal({ isOpen, onClose }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [validating, setValidating] = useState(false);
 
-  useEffect(() => {
+  const [prevOpen, setPrevOpen] = useState(isOpen);
+  if (isOpen !== prevOpen) {
+    setPrevOpen(isOpen);
     if (isOpen) {
       setShowInput(false);
       setCode("");
       setError(null);
     }
-  }, [isOpen]);
+  }
 
   const redirect = useCallback(
     (finalCode: string) => {
