@@ -135,6 +135,7 @@ model Checkpoint {
 model Machine {
   id           String     @id @default(cuid())
   name         String     // Nom du flipper (ex: "The Addams Family")
+  mapId        String?    // matching jeu /v1 (null pour les machines du seed)
   checkpointId String
   checkpoint   Checkpoint @relation(fields: [checkpointId], references: [id])
   createdAt    DateTime   @default(now())
