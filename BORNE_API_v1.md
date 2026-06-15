@@ -39,16 +39,20 @@ Toutes les requêtes et réponses sont en `application/json` (UTF-8).
 
 ## 3. Authentification
 
-Toutes les écritures borne exigent une clé d'API en **Bearer token** :
+Toutes les écritures borne exigent un **token par borne** en **Bearer token** :
 
 ```
-Authorization: Bearer <CABINET_KEY>
+Authorization: Bearer <tokenBorne>
 ```
 
-- La `CABINET_KEY` vous est fournie séparément (ne jamais la commiter ni l'exposer côté client).
-- Requise sur : `POST /v1/scores`.
-- Non requise sur : `GET /v1/leaderboard`, `GET/POST /v1/claim/{code}` (publics).
-- Clé absente / invalide → `401 Unauthorized`.
+- Le token est **provisionné par un administrateur** (`POST /api/admin/bornes/:id/token`) et renvoyé **en clair une seule fois** à la création. Stockez-le de façon sécurisée sur la borne ; il n'est pas récupérable ensuite (seul son hash est conservé côté serveur). Pour en obtenir un nouveau, demandez une **rotation** (régénération) — l'ancien est invalidé.
+- Le token commence par `brk_`. Ne jamais le commiter ni l'exposer côté client.
+- Avec un token par borne, **le `cabinetId` est déduit du token côté serveur** : la borne n'a plus besoin de l'envoyer (s'il est présent dans le body, il est ignoré). Voir §4.
+- Requis sur : `POST /v1/scores`.
+- Non requis sur : `GET /v1/leaderboard`, `GET/POST /v1/claim/{code}` (publics).
+- Token absent / invalide → `401 Unauthorized`.
+
+> **`CABINET_KEY` (DÉPRÉCIÉE).** L'ancienne clé partagée `CABINET_KEY` reste acceptée pendant la transition : dans ce mode legacy, le `cabinetId` est **pris du body** (comme avant). Migrez vers un token par borne dès que possible — il permet la révocation individuelle et passe à l'échelle (>1000 bornes).
 
 ---
 
@@ -58,7 +62,7 @@ Enregistre une partie terminée et renvoie le code de claim + l'URL à encoder d
 
 **Headers**
 ```
-Authorization: Bearer <CABINET_KEY>
+Authorization: Bearer <tokenBorne>
 Content-Type: application/json
 ```
 
@@ -66,7 +70,7 @@ Content-Type: application/json
 
 | Champ | Type | Requis | Contraintes |
 |-------|------|:------:|-------------|
-| `cabinetId` | string | ✅ | identifiant borne, libre (ex. `"borne-paris-01"`), non vide |
+| `cabinetId` | string | ⚠️ | identifiant borne, libre (ex. `"borne-paris-01"`), non vide. **Ignoré** si authentifié par token par borne (déduit du token). **Requis** uniquement en mode legacy `CABINET_KEY`. |
 | `mapId` | string | ✅ | identifiant du jeu/table, libre (ex. `"strangerthings"`), non vide |
 | `score` | integer | ✅ | entier `1` … `99 999 999` |
 | `maxCombo` | integer | ❌ | `≥ 0` |
@@ -81,10 +85,9 @@ Content-Type: application/json
 **Exemple**
 ```bash
 curl -X POST https://<base>/v1/scores \
-  -H "Authorization: Bearer $CABINET_KEY" \
+  -H "Authorization: Bearer $BORNE_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "cabinetId": "borne-paris-01",
     "mapId": "strangerthings",
     "score": 1240500,
     "maxCombo": 12,
@@ -228,8 +231,8 @@ Body : `{ "pseudo": "Anthony" }`
 
 ## 8. Checklist d'intégration borne
 
-- [ ] `CABINET_KEY` stockée de façon sécurisée sur la borne
-- [ ] `cabinetId` et `mapId` : convention de nommage figée
+- [ ] Token par borne (`brk_…`) provisionné par l'admin et stocké de façon sécurisée sur la borne
+- [ ] `mapId` : convention de nommage figée (`cabinetId` déduit du token, plus besoin de l'envoyer)
 - [ ] `POST /v1/scores` en fin de partie, **une seule fois**
 - [ ] `playedAt` en ISO-8601 **avec offset**
 - [ ] _(recommandé)_ `gameId` (UUID) généré une fois par partie pour l'idempotence, **réutilisé sur chaque retry**
