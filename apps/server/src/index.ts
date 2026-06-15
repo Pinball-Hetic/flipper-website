@@ -10,6 +10,7 @@ import { CheckpointController } from "./interface/CheckpointController";
 import { UserController } from "./interface/UserController";
 import { PseudoController } from "./interface/PseudoController";
 import { AdminController } from "./interface/AdminController";
+import { BorneAdminController } from "./interface/BorneAdminController";
 import { MachineController } from "./interface/MachineController";
 import { V1ScoreController } from "./interface/V1ScoreController";
 import { V1ClaimController } from "./interface/V1ClaimController";
@@ -63,6 +64,10 @@ app.post("/api/users/pseudo", PseudoController.set);
 app.get("/api/users/pseudo/check", PseudoController.check);
 app.get("/api/machines", MachineController.getAll);
 app.get("/api/admin/ping", AdminController.ping);
+app.post("/api/admin/bornes", BorneAdminController.create);
+app.get("/api/admin/bornes", BorneAdminController.list);
+app.get("/api/admin/bornes/:id", BorneAdminController.get);
+app.patch("/api/admin/bornes/:id", BorneAdminController.update);
 
 app.post("/api/scores", ScoreController.handle);
 app.post("/api/pending-scores", PendingScoreController.handle);
