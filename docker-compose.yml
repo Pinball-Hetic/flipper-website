@@ -14,6 +14,16 @@ services:
     depends_on:
       - client
       - server
+    networks:
+      - default
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.flippix-app.rule=Host(`app.flippix.dev.azhao.fr`)"
+      - "traefik.http.routers.flippix-app.entrypoints=websecure"
+      - "traefik.http.routers.flippix-app.tls.certresolver=letsencrypt"
+      - "traefik.http.services.flippix-app.loadbalancer.server.port=8881"
     restart: always
 
   client:
@@ -30,6 +40,10 @@ services:
       - NODE_ENV=production
       - CLIENT_URL=http://client:8888
       - SERVER_URL=http://server:8882
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
     restart: always
 
   server:
@@ -42,4 +56,19 @@ services:
     env_file: .env
     environment:
       - NODE_ENV=production
+    networks:
+      - default
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.flippix-api.rule=Host(`api.flippix.dev.azhao.fr`)"
+      - "traefik.http.routers.flippix-api.entrypoints=websecure"
+      - "traefik.http.routers.flippix-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.flippix-api.loadbalancer.server.port=8882"
     restart: always
+
+networks:
+  default:
+  web:
+    external: true
