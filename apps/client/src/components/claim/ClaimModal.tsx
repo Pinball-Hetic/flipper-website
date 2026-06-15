@@ -31,7 +31,7 @@ const serverUrl =
 
 async function validateCode(code: string): Promise<string | null> {
   try {
-    const res = await fetch(`${serverUrl}/api/pending-scores/${code}`);
+    const res = await fetch(`${serverUrl}/v1/claim/${code}`);
     if (res.status === 404) return "Code invalide ou expiré.";
     if (res.status === 409) return "Ce score a déjà été réclamé.";
     if (!res.ok) return "Erreur serveur, réessaie.";
