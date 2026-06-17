@@ -4,19 +4,18 @@ import { Suspense } from "react";
 import { authClient } from "@/lib/auth-client";
 import { PseudoForm } from "@/components/pseudo/PseudoForm";
 import { Loader2, Zap } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 function OnboardingPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") ?? "/";
   const { data: session, isPending } = authClient.useSession();
 
-  const handleSuccess = (_pseudo: string) => {
-    // Force a full navigation so the middleware re-evaluates the session
-    // (pseudo is now set — the onboarding redirect must not fire again).
-    router.push(redirectTo);
-    router.refresh();
+  const handleSuccess = () => {
+    // Full-page navigation: reloads so authClient.useSession() refetches a
+    // fresh session (pseudo now set). A soft router.push keeps the stale
+    // cached session, so the claim page would re-show the onboarding CTA.
+    window.location.assign(redirectTo);
   };
 
   if (isPending) {
