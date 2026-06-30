@@ -1,4 +1,4 @@
-import type { IUserRepository } from "../domain/IUserRepository";
+import type { IUserRepository, UserSummary } from "../domain/IUserRepository";
 import { prisma } from "./prisma";
 
 export class PrismaUserRepository implements IUserRepository {
@@ -17,11 +17,29 @@ export class PrismaUserRepository implements IUserRepository {
     return user;
   }
 
-  async findById(userId: string): Promise<{ id: string; pseudoUpdatedAt: Date | null } | null> {
+  async findById(
+    userId: string,
+  ): Promise<{
+    id: string;
+    pseudo: string | null;
+    pseudoUpdatedAt: Date | null;
+    role: string;
+  } | null> {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, pseudoUpdatedAt: true },
+      select: { id: true, pseudo: true, pseudoUpdatedAt: true, role: true },
     });
     return user;
+  }
+
+  async list(): Promise<UserSummary[]> {
+    return prisma.user.findMany({
+      select: { id: true, email: true, pseudo: true, role: true },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
+  async updateRole(userId: string, role: string): Promise<void> {
+    await prisma.user.update({ where: { id: userId }, data: { role } });
   }
 }

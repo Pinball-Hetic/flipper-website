@@ -25,6 +25,8 @@ const makeMachineRepo = (exists = true): IMachineRepository => ({
   existsById: vi.fn().mockResolvedValue(exists),
   findAll: vi.fn().mockResolvedValue([]),
   findWithScoresByCheckpoint: vi.fn().mockResolvedValue([]),
+  findByCheckpointAndMapId: vi.fn().mockResolvedValue(null),
+  create: vi.fn(),
 });
 
 const validInput = {

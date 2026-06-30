@@ -13,6 +13,7 @@ export interface BorneScore {
   pseudo?: string;
   claimed: boolean;
   claimedAt?: Date;
+  claimedByUserId?: string;
   expiresAt: Date;
   createdAt: Date;
 }

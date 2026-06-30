@@ -15,7 +15,7 @@ function isPublic(pathname) {
 }
 
 export async function middleware(request) {
-  const { pathname } = request.nextUrl;
+  const { pathname, search } = request.nextUrl;
 
   if (isPublic(pathname)) {
     return NextResponse.next();
@@ -34,8 +34,22 @@ export async function middleware(request) {
     const session = await res.json();
     const pseudo = session?.user?.pseudo;
 
+    if (pathname.startsWith("/admin")) {
+      if (!session?.user) {
+        const loginUrl = new URL("/login", request.url);
+        loginUrl.searchParams.set("redirect", pathname + search);
+        return NextResponse.redirect(loginUrl);
+      }
+      if (session.user.role !== "admin") {
+        return NextResponse.redirect(new URL("/", request.url));
+      }
+      return NextResponse.next();
+    }
+
     if (session?.user && (pseudo === null || pseudo === undefined)) {
-      return NextResponse.redirect(new URL("/onboarding", request.url));
+      const onboardingUrl = new URL("/onboarding", request.url);
+      onboardingUrl.searchParams.set("redirect", pathname + search);
+      return NextResponse.redirect(onboardingUrl);
     }
   } catch {
     // Ne pas bloquer la navigation si l'endpoint auth est indisponible

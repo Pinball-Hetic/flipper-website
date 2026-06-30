@@ -12,6 +12,7 @@ export interface IScoreRepository {
     value: number;
     machineId: string;
     userId: string;
+    createdAt?: Date;
   }): Promise<Score>;
 
   existsRecentScore(machineId: string, pseudo: string, withinSeconds: number): Promise<boolean>;
