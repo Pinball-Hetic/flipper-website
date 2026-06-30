@@ -39,12 +39,14 @@ export class PrismaScoreRepository implements IScoreRepository {
     value: number;
     machineId: string;
     userId: string;
+    createdAt?: Date;
   }): Promise<Score> {
     const score = await prisma.score.create({
       data: {
         value: data.value,
         machineId: data.machineId,
         userId: data.userId,
+        ...(data.createdAt ? { createdAt: data.createdAt } : {}),
       },
     });
 

@@ -1,6 +1,7 @@
 export interface Machine {
   id: string;
   name: string;
+  mapId?: string;
   checkpointId: string;
   checkpointName: string;
   createdAt: Date;
@@ -17,4 +18,6 @@ export interface IMachineRepository {
   existsById(id: string): Promise<boolean>;
   findAll(): Promise<Machine[]>;
   findWithScoresByCheckpoint(checkpointId: string): Promise<MachineWithScores[]>;
+  findByCheckpointAndMapId(checkpointId: string, mapId: string): Promise<Machine | null>;
+  create(data: { checkpointId: string; name: string; mapId: string }): Promise<Machine>;
 }

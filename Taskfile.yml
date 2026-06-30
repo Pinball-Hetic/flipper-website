@@ -59,6 +59,11 @@ tasks:
     cmds:
       - npm run db:studio -w @pocket-maps/database
 
+  db:make-admin:
+    desc: "Promote a user to admin — task db:make-admin EMAIL=you@example.com"
+    cmds:
+      - npm run db:make-admin -w @pocket-maps/database -- {{.EMAIL}}
+
   # 🐳 Docker (Orchestration)
   up:
     desc: "Start development environment (Docker)"

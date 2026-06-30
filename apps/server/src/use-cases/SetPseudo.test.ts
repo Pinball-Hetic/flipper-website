@@ -7,6 +7,8 @@ const makeUserRepo = (overrides: Partial<IUserRepository> = {}): IUserRepository
   findById: vi.fn().mockResolvedValue({ id: "user-1", pseudoUpdatedAt: null }),
   findByPseudo: vi.fn().mockResolvedValue(null),
   setPseudo: vi.fn().mockResolvedValue(undefined),
+  list: vi.fn().mockResolvedValue([]),
+  updateRole: vi.fn().mockResolvedValue(undefined),
   ...overrides,
 });
 

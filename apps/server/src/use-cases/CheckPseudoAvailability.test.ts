@@ -7,6 +7,8 @@ const makeUserRepo = (found: boolean): IUserRepository => ({
   findById: vi.fn(),
   findByPseudo: vi.fn().mockResolvedValue(found ? { id: "user-1" } : null),
   setPseudo: vi.fn(),
+  list: vi.fn().mockResolvedValue([]),
+  updateRole: vi.fn(),
 });
 
 const makeScoreRepo = (exists: boolean): IScoreRepository => ({
@@ -48,6 +50,8 @@ describe("CheckPseudoAvailability", () => {
       findById: vi.fn(),
       findByPseudo: vi.fn().mockImplementation(async () => { calls.push("user"); return null; }),
       setPseudo: vi.fn(),
+      list: vi.fn().mockResolvedValue([]),
+      updateRole: vi.fn(),
     };
     const scoreRepo: IScoreRepository = {
       save: vi.fn(),

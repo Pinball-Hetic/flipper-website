@@ -38,10 +38,15 @@ export class PrismaBorneScoreRepository implements IBorneScoreRepository {
     return row !== null;
   }
 
-  async claimByCode(code: string, pseudo: string, claimedAt: Date): Promise<boolean> {
+  async claimByCode(
+    code: string,
+    pseudo: string,
+    claimedAt: Date,
+    userId?: string,
+  ): Promise<boolean> {
     const result = await prisma.borneScore.updateMany({
       where: { code, claimed: false },
-      data: { claimed: true, pseudo, claimedAt },
+      data: { claimed: true, pseudo, claimedAt, claimedByUserId: userId ?? null },
     });
     return result.count === 1;
   }
@@ -70,6 +75,7 @@ export class PrismaBorneScoreRepository implements IBorneScoreRepository {
     pseudo: string | null;
     claimed: boolean;
     claimedAt: Date | null;
+    claimedByUserId: string | null;
     expiresAt: Date;
     createdAt: Date;
   }): BorneScore {
@@ -88,6 +94,7 @@ export class PrismaBorneScoreRepository implements IBorneScoreRepository {
       pseudo: row.pseudo ?? undefined,
       claimed: row.claimed,
       claimedAt: row.claimedAt ?? undefined,
+      claimedByUserId: row.claimedByUserId ?? undefined,
       expiresAt: row.expiresAt,
       createdAt: row.createdAt,
     };

@@ -14,23 +14,18 @@ app.use(cors({
   credentials: true,
 }));
 
-// 1. Redirection spécifique pour le Serveur API (SAUF /api/auth)
-// Proxy créé UNE seule fois au démarrage (sinon fuite mémoire : une instance par requête)
-const apiProxy = createProxyMiddleware({ target: SERVER_TARGET, changeOrigin: true });
-app.use('/api', (req, res, next) => {
-  if (req.url.startsWith('/auth') || req.path.startsWith('/auth')) {
-    // Si c'est de l'auth, on ne traite pas ici, on laisse passer au proxy suivant (le client)
-    return next();
-  }
-  // Sinon, on envoie vers le serveur Express
-  return apiProxy(req, res, next);
-});
-
-// 1bis. Contrat /v1 (bornes) vers le Serveur Express
-app.use('/v1', createProxyMiddleware({
+// 1. /api (hors /api/auth) et /v1 (bornes) -> serveur Express.
+// Monté SANS préfixe de chemin : Express ne strip pas le mount path, donc le
+// chemin COMPLET (/api/..., /v1/...) est préservé vers le serveur.
+// pathFilter sélectionne ce qui part vers le serveur ; sinon next() -> client.
+// Proxy créé UNE seule fois au démarrage (jamais par requête : pas de fuite mémoire).
+const serverProxy = createProxyMiddleware({
   target: SERVER_TARGET,
   changeOrigin: true,
-}));
+  pathFilter: (path) =>
+    (path.startsWith('/api') && !path.startsWith('/api/auth')) || path.startsWith('/v1'),
+});
+app.use(serverProxy);
 
 // 2. TOUT le reste (UI + Auth) vers le Client Next.js
 app.use('/', createProxyMiddleware({

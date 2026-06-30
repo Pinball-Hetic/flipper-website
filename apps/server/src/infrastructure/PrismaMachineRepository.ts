@@ -15,10 +15,49 @@ export class PrismaMachineRepository implements IMachineRepository {
     return rows.map((r) => ({
       id: r.id,
       name: r.name,
+      mapId: r.mapId ?? undefined,
       checkpointId: r.checkpointId,
       checkpointName: r.checkpoint.name,
       createdAt: r.createdAt,
     }));
+  }
+
+  async findByCheckpointAndMapId(
+    checkpointId: string,
+    mapId: string,
+  ): Promise<Machine | null> {
+    const row = await prisma.machine.findFirst({
+      where: { checkpointId, mapId },
+      include: { checkpoint: { select: { name: true } } },
+    });
+    if (!row) return null;
+    return {
+      id: row.id,
+      name: row.name,
+      mapId: row.mapId ?? undefined,
+      checkpointId: row.checkpointId,
+      checkpointName: row.checkpoint.name,
+      createdAt: row.createdAt,
+    };
+  }
+
+  async create(data: {
+    checkpointId: string;
+    name: string;
+    mapId: string;
+  }): Promise<Machine> {
+    const row = await prisma.machine.create({
+      data,
+      include: { checkpoint: { select: { name: true } } },
+    });
+    return {
+      id: row.id,
+      name: row.name,
+      mapId: row.mapId ?? undefined,
+      checkpointId: row.checkpointId,
+      checkpointName: row.checkpoint.name,
+      createdAt: row.createdAt,
+    };
   }
 
   async findWithScoresByCheckpoint(checkpointId: string): Promise<MachineWithScores[]> {
